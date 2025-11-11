@@ -34,7 +34,11 @@
       --font-primary: 'AlMohanad', sans-serif;
       --page-width: 210mm;
       --page-height: 297mm;
-      --subject-accent: #aab4aa;
+      --subject-accent: #c2d1c2;
+      --latin-font-family: 'Segoe UI', Tahoma, sans-serif;
+      --latin-font-size: 17px;
+      --latin-font-weight: 600;
+      --latin-line-height: 1.2;
     }
 
     /* ضبط القيم الافتراضية */
@@ -120,6 +124,19 @@
       font-size: inherit;
       font-weight: inherit;
       line-height: inherit;
+    }
+
+    /* تخصيص موحّد للنصوص الإنجليزية */
+    .writing-area :lang(en),
+    .sheet-footer :lang(en) {
+      font-family: var(--latin-font-family);
+      font-size: var(--latin-font-size);
+      font-weight: var(--latin-font-weight);
+      line-height: var(--latin-line-height);
+      letter-spacing: 0.01em;
+      direction: ltr;
+      text-align: left;
+      display: inline-block;
     }
 
     /* كل سطر منفصل مع تباعد متساوٍ */
@@ -304,7 +321,7 @@
           <div class="preview-recipient">
             <div>مركز خدمات التجارة</div>
             <div>ص.ب. 3555 جده 21481</div>
-            <div>البريد الإلكتروني: tradej-lg@alahli.com</div>
+            <div>البريد الإلكتروني: <span lang="en">tradej-lg@alahli.com</span></div>
           </div>
 
           <div class="preview-greeting">
@@ -321,7 +338,7 @@
               إشارة إلى الضمان البنكي النهائي الموضح أعلاه، والصادر منكم لصالحنا على حساب شركة رؤية القوى للمصاعد
               بمبلغ قدره (20,000.00) ريال، نأمل منكم تمديد فترة سريان الضمان حتى تاريخ 30 يوليو 2026م مع بقاء
               الشروط الأخرى دون تغيير، وإفادتنا بذلك من خلال البريد الإلكتروني المخصص للضمانات البنكية لدى
-              مستشفى الملك فيصل التخصصي ومركز الأبحاث بالرياض (bgfinance@kfshrc.edu.sa)، كما نأمل منكم إرسال أصل
+              مستشفى الملك فيصل التخصصي ومركز الأبحاث بالرياض (<span lang="en">bgfinance@kfshrc.edu.sa</span>)، كما نأمل منكم إرسال أصل
               تمديد الضمان إلى العنوان التالي:
             </p>
 
@@ -351,8 +368,8 @@
     </div>
     <!-- توقيع أو تذييل داخلي ضمن نفس الورقة -->
     <div class="sheet-footer" id="sheetFooter" aria-label="معلومات إضافية في التذييل">
-      <span class="footer-left" id="footerLeftField" contenteditable="false">MBC: 9-2</span>
-      <span class="footer-right" id="footerRightField" contenteditable="false">BAMZ</span>
+      <span class="footer-left" id="footerLeftField" contenteditable="false" lang="en">MBC: 9-2</span>
+      <span class="footer-right" id="footerRightField" contenteditable="false" lang="en">BAMZ</span>
     </div>
   </main>
 
