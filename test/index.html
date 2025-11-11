@@ -96,6 +96,107 @@
       opacity: 0.9;
     }
 
+    /* لوحة إدخال البيانات */
+    .data-panel {
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: min(360px, 90vw);
+      height: 100vh;
+      background: #ffffff;
+      box-shadow: -8px 0 24px rgba(0, 0, 0, 0.1);
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      transform: translateX(105%);
+      transition: transform 0.3s ease;
+      z-index: 15;
+      border-radius: 12px 0 0 12px;
+    }
+
+    .data-panel.is-open {
+      transform: translateX(0);
+    }
+
+    .data-panel__header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .data-panel__header h2 {
+      font-size: 1.1rem;
+      margin: 0;
+    }
+
+    .data-panel__header button {
+      border: none;
+      background: transparent;
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+
+    #letterDataForm {
+      overflow-y: auto;
+      padding-inline-end: 6px;
+    }
+
+    .panel-group {
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 12px;
+      background: #fafafa;
+    }
+
+    .panel-group h3 {
+      font-size: 0.95rem;
+      margin-bottom: 8px;
+    }
+
+    .panel-group label {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font-size: 0.85rem;
+      margin-bottom: 10px;
+    }
+
+    .panel-group input {
+      border: 1px solid rgba(0, 0, 0, 0.2);
+      border-radius: 8px;
+      padding: 6px 10px;
+      font-size: 0.9rem;
+      text-align: right;
+      font-family: inherit;
+    }
+
+    .panel-actions {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .panel-actions button {
+      flex: 1;
+      padding: 10px 0;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+
+    #resetDataBtn {
+      background: #f1f1f1;
+    }
+
+    #closeAndSaveBtn {
+      background: #0b6fa4;
+      color: #fff;
+    }
+
     /* الورقة */
     .letter-sheet {
       width: var(--page-width);
@@ -312,6 +413,9 @@
       #actionToolbar {
         display: none !important;
       }
+      #dataPanel {
+        display: none !important;
+      }
       .preview-subject {
         background: var(--subject-accent) !important;
       }
@@ -322,8 +426,70 @@
 <body id="pageRoot" data-eastern-digits="true">
   <!-- شريط الأدوات للتحكم بعملية التصدير -->
   <div class="toolbar" id="actionToolbar">
+    <button type="button" id="toggleEditorBtn" aria-controls="dataPanel">تحرير البيانات</button>
     <button id="downloadBtn" aria-controls="letterSheetCanvas">استخراج PDF</button>
   </div>
+
+  <aside class="data-panel" id="dataPanel" aria-hidden="true">
+    <div class="data-panel__header">
+      <h2>محرر البيانات</h2>
+      <button type="button" id="closeEditorBtn" aria-label="إغلاق المحرر">×</button>
+    </div>
+    <form id="letterDataForm" autocomplete="off">
+      <div class="panel-group">
+        <h3>بيانات البنك</h3>
+        <label>
+          اسم البنك
+          <input type="text" name="bankName" id="bankNameInput" />
+        </label>
+        <label>
+          المركز
+          <input type="text" name="bankCenter" id="bankCenterInput" />
+        </label>
+        <label>
+          صندوق البريد
+          <input type="text" name="bankPoBox" id="bankPoBoxInput" />
+        </label>
+        <label>
+          البريد الإلكتروني
+          <input type="email" name="bankEmail" id="bankEmailInput" />
+        </label>
+      </div>
+
+      <div class="panel-group">
+        <h3>الضمان</h3>
+        <label>
+          رقم الضمان
+          <input type="text" name="guaranteeNumber" id="guaranteeNumberInput" />
+        </label>
+        <label>
+          رقم العقد
+          <input type="text" name="contractNumber" id="contractNumberInput" />
+        </label>
+        <label>
+          قيمة الضمان
+          <input type="text" name="guaranteeAmount" id="guaranteeAmountInput" />
+        </label>
+        <label>
+          تاريخ التمديد
+          <input type="text" name="extensionDate" id="extensionDateInput" />
+        </label>
+      </div>
+
+      <div class="panel-group">
+        <h3>الشركة</h3>
+        <label>
+          اسم الشركة
+          <input type="text" name="companyName" id="companyNameInput" />
+        </label>
+      </div>
+
+      <div class="panel-actions">
+        <button type="button" id="resetDataBtn">استعادة الافتراضي</button>
+        <button type="button" id="closeAndSaveBtn">تم</button>
+      </div>
+    </form>
+  </aside>
   <!-- مسرح الورقة بقياس A4 -->
   <main class="letter-sheet" id="letterSheetCanvas" aria-label="ورقة الخطاب A4">
     <div class="sheet-content" id="sheetContent">
@@ -335,16 +501,16 @@
         <article class="preview-container" id="primaryLetter">
           <div class="preview-header">
             <div class="preview-recipient-name" id="bank_name">
-              <div>السـادة / البنك الأهلي السعودي</div>
+              <div>السـادة / <span data-field="bankName">البنك الأهلي السعودي</span></div>
             </div>
             <div class="preview-salutation">
               <div>المحترمين</div>
             </div>
           </div>
           <div class="preview-recipient">
-            <div>مركز خدمات التجارة</div>
-            <div>ص.ب. 3555 جده 21481</div>
-            <div>البريد الإلكتروني: <span lang="en">tradej-lg@alahli.com</span></div>
+            <div data-field="bankCenter">مركز خدمات التجارة</div>
+            <div>ص.ب. <span data-field="bankPoBox">3555 جده 21481</span></div>
+            <div>البريد الإلكتروني: <span data-field="bankEmail" lang="en">tradej-lg@alahli.com</span></div>
           </div>
 
           <div class="preview-greeting">
@@ -353,13 +519,17 @@
 
           <div class="preview-subject">
             <div class="preview-subject-label">الموضوع:</div>
-            <div class="preview-subject-text">طلب تمديد لنجرب نص اطول وماذا يحدث هنا الضمان البنكي رقم (M113528) والعائد للعقد رقم (434153).</div>
+            <div class="preview-subject-text">
+              طلب تمديد الضمان البنكي رقم (<span data-field="guaranteeNumber" lang="en">M113528</span>) والعائد للعقد رقم (<span data-field="contractNumber" lang="en">434153</span>).
+            </div>
           </div>
 
           <div class="preview-content">
             <p class="letter-paragraph">
-              إشارة إلى الضمان البنكي النهائي الموضح أعلاه، والصادر منكم لصالحنا على حساب شركة رؤية القوى للمصاعد
-              بمبلغ قدره (20,000.00) ريال، نأمل منكم تمديد فترة سريان الضمان حتى تاريخ 30 يوليو 2026م مع بقاء
+              إشارة إلى الضمان البنكي النهائي الموضح أعلاه، والصادر منكم لصالحنا على حساب شركة
+              <span data-field="companyName">رؤية القوى للمصاعد</span>
+              بمبلغ قدره (<span data-field="guaranteeAmount">20,000.00</span>) ريال، نأمل منكم تمديد فترة سريان الضمان حتى تاريخ
+              <span data-field="extensionDate">30 يوليو 2026</span>م مع بقاء
               الشروط الأخرى دون تغيير، وإفادتنا بذلك من خلال البريد الإلكتروني المخصص للضمانات البنكية لدى
               مستشفى الملك فيصل التخصصي ومركز الأبحاث بالرياض (<span lang="en">bgfinance@kfshrc.edu.sa</span>)، كما نأمل منكم إرسال أصل
               تمديد الضمان إلى العنوان التالي:
@@ -425,6 +595,15 @@
       }
     }
 
+    function applyEasternDigits() {
+      if (document.body?.dataset?.easternDigits === 'true') {
+        const target = document.getElementById('primaryLetter');
+        if (target) {
+          convertDigitsInNode(target);
+        }
+      }
+    }
+
     // مراجع DOM الرئيسة التي نحتاجها للتصدير
     const letterSheet = document.getElementById('letterSheetCanvas');
     const btn = document.getElementById('downloadBtn');
@@ -445,10 +624,6 @@
 
       setButtonState('تحميل PDF');
       return true;
-    }
-
-    if (document.body?.dataset?.easternDigits === 'true') {
-      convertDigitsInNode(document.body);
     }
 
     evaluateReadyState();
@@ -486,6 +661,176 @@
         setButtonState('حدث خطأ، أعد المحاولة', false);
       }
     });
+
+    // ----- إدارة البيانات الديناميكية -----
+    const DATA_STORAGE_KEY = 'letterBinderStateV1';
+    const cloneState = (obj) => (typeof structuredClone === 'function'
+      ? structuredClone(obj)
+      : JSON.parse(JSON.stringify(obj)));
+    const defaultState = {
+      bank: {
+        name: 'البنك الأهلي السعودي',
+        center: 'مركز خدمات التجارة',
+        poBox: '3555 جده 21481',
+        email: 'tradej-lg@alahli.com'
+      },
+      guarantee: {
+        number: 'M113528',
+        contract: '434153',
+        amount: '20,000.00',
+        extensionDate: '30 يوليو 2026'
+      },
+      company: {
+        name: 'شركة رؤية القوى للمصاعد'
+      }
+    };
+
+    const viewBindings = {
+      bankName: document.querySelector('[data-field="bankName"]'),
+      bankCenter: document.querySelector('[data-field="bankCenter"]'),
+      bankPoBox: document.querySelector('[data-field="bankPoBox"]'),
+      bankEmail: document.querySelector('[data-field="bankEmail"]'),
+      guaranteeNumber: document.querySelector('[data-field="guaranteeNumber"]'),
+      contractNumber: document.querySelector('[data-field="contractNumber"]'),
+      guaranteeAmount: document.querySelector('[data-field="guaranteeAmount"]'),
+      extensionDate: document.querySelector('[data-field="extensionDate"]'),
+      companyName: document.querySelector('[data-field="companyName"]')
+    };
+
+    const bindingPaths = {
+      bankName: ['bank', 'name'],
+      bankCenter: ['bank', 'center'],
+      bankPoBox: ['bank', 'poBox'],
+      bankEmail: ['bank', 'email'],
+      guaranteeNumber: ['guarantee', 'number'],
+      contractNumber: ['guarantee', 'contract'],
+      guaranteeAmount: ['guarantee', 'amount'],
+      extensionDate: ['guarantee', 'extensionDate'],
+      companyName: ['company', 'name']
+    };
+
+    let appState = loadState();
+    applyStateToView();
+    setupDataPanel();
+
+    function loadState() {
+      try {
+        const stored = localStorage.getItem(DATA_STORAGE_KEY);
+        if (stored) {
+          return Object.assign({}, cloneState(defaultState), JSON.parse(stored));
+        }
+      } catch (error) {
+        console.warn('تعذر تحميل البيانات المحفوظة', error);
+      }
+      return cloneState(defaultState);
+    }
+
+    function saveState() {
+      try {
+        localStorage.setItem(DATA_STORAGE_KEY, JSON.stringify(appState));
+      } catch (error) {
+        console.warn('تعذر حفظ البيانات', error);
+      }
+    }
+
+    function setFieldValue(key, value) {
+      const el = viewBindings[key];
+      if (el) {
+        el.textContent = value ?? '';
+      }
+    }
+
+    function applyStateToView() {
+      setFieldValue('bankName', appState.bank.name);
+      setFieldValue('bankCenter', appState.bank.center);
+      setFieldValue('bankPoBox', appState.bank.poBox);
+      setFieldValue('bankEmail', appState.bank.email);
+      setFieldValue('guaranteeNumber', appState.guarantee.number);
+      setFieldValue('contractNumber', appState.guarantee.contract);
+      setFieldValue('guaranteeAmount', appState.guarantee.amount);
+      setFieldValue('extensionDate', appState.guarantee.extensionDate);
+      setFieldValue('companyName', appState.company.name);
+      applyEasternDigits();
+    }
+
+    function setupDataPanel() {
+      const panel = document.getElementById('dataPanel');
+      const toggleBtn = document.getElementById('toggleEditorBtn');
+      const closeBtn = document.getElementById('closeEditorBtn');
+      const doneBtn = document.getElementById('closeAndSaveBtn');
+      const resetBtn = document.getElementById('resetDataBtn');
+      const form = document.getElementById('letterDataForm');
+
+      if (!panel || !form) {
+        return;
+      }
+
+      populateForm(form);
+
+      const closePanel = () => {
+        panel.classList.remove('is-open');
+        panel.setAttribute('aria-hidden', 'true');
+      };
+
+      const openPanel = () => {
+        populateForm(form);
+        panel.classList.add('is-open');
+        panel.setAttribute('aria-hidden', 'false');
+      };
+
+      toggleBtn?.addEventListener('click', () => {
+        if (panel.classList.contains('is-open')) {
+          closePanel();
+        } else {
+          openPanel();
+        }
+      });
+
+      closeBtn?.addEventListener('click', closePanel);
+      doneBtn?.addEventListener('click', closePanel);
+
+      resetBtn?.addEventListener('click', () => {
+        appState = cloneState(defaultState);
+        saveState();
+        populateForm(form);
+        applyStateToView();
+      });
+
+      form.addEventListener('input', (event) => {
+        const input = event.target;
+        if (!(input instanceof HTMLInputElement)) {
+          return;
+        }
+        const key = input.name;
+        updateStateValue(key, input.value);
+        saveState();
+        applyStateToView();
+      });
+    }
+
+    function populateForm(form) {
+      form.bankName.value = appState.bank.name;
+      form.bankCenter.value = appState.bank.center;
+      form.bankPoBox.value = appState.bank.poBox;
+      form.bankEmail.value = appState.bank.email;
+      form.guaranteeNumber.value = appState.guarantee.number;
+      form.contractNumber.value = appState.guarantee.contract;
+      form.guaranteeAmount.value = appState.guarantee.amount;
+      form.extensionDate.value = appState.guarantee.extensionDate;
+      form.companyName.value = appState.company.name;
+    }
+
+    function updateStateValue(key, value) {
+      const path = bindingPaths[key];
+      if (!path) {
+        return;
+      }
+      let cursor = appState;
+      for (let i = 0; i < path.length - 1; i += 1) {
+        cursor = cursor[path[i]];
+      }
+      cursor[path[path.length - 1]] = value;
+    }
   </script>
 </body>
 </html>
