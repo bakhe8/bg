@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ورقة اختبار خطابات الضمان</title>
+  <style>
+    /* تحميل عائلة الخط بأوزان متعددة للاستخدام داخل المستند */
+    @font-face {
+      font-family: 'AlMohanad-Regular';
+      src: url("assets/AL-Mohanad.ttf") format("truetype");
+      font-weight: 400;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    @font-face {
+      font-family: 'AlMohanad-Bold';
+      src: url("assets/AL-Mohanad Bold.ttf") format("truetype");
+      font-weight: 600;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    @font-face {
+      font-family: 'AlMohanad-ExtraBold';
+      src: url("assets/AL-Mohanad Extra Bold.ttf") format("truetype");
+      font-weight: 700;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    :root {
+      --font-regular: 'AlMohanad-Regular', 'Segoe UI', Tahoma, sans-serif;
+      --font-bold: 'AlMohanad-Bold', 'Segoe UI', Tahoma, sans-serif;
+      --font-extrabold: 'AlMohanad-ExtraBold', 'Segoe UI', Tahoma, sans-serif;
+      --page-width: 210mm;
+      --page-height: 297mm;
+      --subject-accent: rgba(0, 0, 0, 0.08);
+    }
+
+    /* ضبط القيم الافتراضية */
+    * {
+      box-sizing: border-box;
+    }
+
+    /* إعداد الخلفية والهيكل العام للصفحة */
+    body {
+      margin: 0;
+      font-family: var(--font-bold);
+      line-height: 1.8;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: center;
+      background: transparent url("assets/External Form.svg") no-repeat center center;
+      background-size: contain;
+      padding: 0;
+    }
+
+    /* شريط الأدوات */
+    .toolbar {
+      position: fixed;
+      top: 16px;
+      left: 16px;
+      z-index: 10;
+    }
+
+    .toolbar button {
+      padding: 10px 18px;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      cursor: pointer;
+      background: #0b6fa4;
+      color: #fff;
+      box-shadow: 0 8px 18px rgba(11, 111, 164, 0.25);
+    }
+
+    .toolbar button:hover {
+      opacity: 0.9;
+    }
+
+    /* الورقة */
+    .letter-sheet {
+      width: var(--page-width);
+      height: var(--page-height);
+      margin: 0;
+      padding: 0;
+      border: none;
+      border-radius: 0;
+      box-shadow: none;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* محتوى الورقة */
+    .sheet-content {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: stretch;
+      padding: 60mm 25mm 0mm 25mm;
+    }
+
+    /* حقل النص الرئيسي للخطاب */
+    .writing-area {
+      width: 100%;
+      flex: 1;
+    }
+
+    /* كل سطر منفصل مع تباعد متساوٍ */
+    .letter-line {
+      margin-bottom: 4mm;
+    }
+
+    .letter-line:last-child {
+      margin-bottom: 0;
+    }
+
+    .letter-paragraph {
+      margin: 0;
+      text-align: justify;
+     }
+
+    /* التذييل */
+    .sheet-footer {
+      margin: -5mm 20mm 20mm 20mm;
+      border: none;
+      background: transparent;
+      outline: none;
+      font-family: var(--font-regular);
+      font-size: 0.6rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8mm;
+    }
+
+    /* إعداد الحقول داخل التذييل */
+    .sheet-footer span {
+      flex: 1;
+      display: inline-block;
+      white-space: pre-wrap;
+    }
+
+    .sheet-footer .footer-left {
+      text-align: right;
+    }
+
+    .sheet-footer .footer-right {
+      text-align: left;
+    }
+
+    /* كتلة المستلم */
+    .preview-container {
+      display: flex;
+      flex-direction: column;
+      gap: 1mm;
+    }
+
+    .preview-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 1mm;
+      align-items: flex-start;
+    }
+
+    .preview-recipient {
+      flex: 1;
+      line-height: 1.6;
+    }
+
+    .preview-salutation {
+      text-align: left;
+    }
+
+    /* الموضوع */
+    .preview-subject {
+      background: var(--subject-accent);
+      display: flex;
+      gap: 8px;
+      padding: 0;
+    }
+
+    .preview-subject-label {
+      white-space: nowrap;
+    }
+
+    .preview-subject-text {
+      flex: 1;
+      text-align: right;
+    }
+
+    /* المحتوى */
+    .preview-content {
+      display: flex;
+      flex-direction: column;
+      gap: 1mm;
+    }
+
+    .preview-greeting {
+      margin: 0;
+    }
+
+    .preview-address-box {
+      margin: 0;
+      padding-right: 30px;
+    }
+
+    /* توقيع */
+    .preview-note {
+      text-align: right;
+      padding-right: 100px;
+    }
+
+    .preview-signature {
+      text-align: center;
+      margin-right: 300px;
+      display: flex;
+      flex-direction: column;
+      gap: 1mm;
+    }
+
+    .preview-signature div + .signature-seal {
+      margin-top: 15mm;
+    }
+
+    @media print {
+      @page {
+        size: A4;
+        margin: 0;
+      }
+      body {
+        display: block;
+        margin: 0;
+        padding: 0;
+        min-height: auto;
+        align-items: initial;
+        justify-content: flex-start;
+      }
+      #actionToolbar {
+        display: none !important;
+      }
+    }
+
+  </style>
+</head>
+<body id="pageRoot">
+  <!-- شريط الأدوات للتحكم بعملية التصدير -->
+  <div class="toolbar" id="actionToolbar">
+    <button id="downloadBtn" aria-controls="letterSheetCanvas">استخراج PDF</button>
+  </div>
+  <!-- مسرح الورقة بقياس A4 -->
+  <main class="letter-sheet" id="letterSheetCanvas" aria-label="ورقة الخطاب A4">
+    <div class="sheet-content" id="sheetContent">
+      <!-- المنطقة القابلة للتحرير الخاصة بنص الخطاب -->
+      <section class="writing-area" id="letterWritingArea" contenteditable="false" aria-label="منطقة الكتابة الرئيسة">
+        <div style="display:none;" aria-hidden="true">تنبيه داخلي: يرجى عدم تعديل خصائص هذا القسم، والتعديل يكون على العناصر أدناه فقط.</div>
+
+        <!-- قالب الخطاب الأساسي مستخدمًا نفس هيكلة preview لضمان توزيع النص -->
+        <article class="preview-container" id="primaryLetter">
+          <div class="preview-header">
+            <div class="preview-recipient-name" id="bank_name">
+              <div>السـادة / البنك الأهلي السعودي</div>
+            </div>
+            <div class="preview-salutation">
+              <div>المحترمين</div>
+            </div>
+          </div>
+          <div class="preview-recipient">
+            <div>مركز خدمات التجارة</div>
+            <div>ص.ب. 3555 جده 21481</div>
+            <div>البريد الإلكتروني: tradej-lg@alahli.com</div>
+          </div>
+
+
+          <div class="preview-greeting">
+            <div>السَّلام عليكُم ورحمَة الله وبركاتِه</div>
+          </div>
+
+          <div class="preview-subject">
+            <div class="preview-subject-label">الموضوع:</div>
+            <div class="preview-subject-text">طلب تمديد لنجرب نص اطول وماذا يحدث هنا الضمان البنكي رقم (M113528) والعائد للعقد رقم (434153).</div>
+          </div>
+
+          <div class="preview-content">
+            <p class="letter-paragraph">
+              إشارة إلى الضمان البنكي النهائي الموضح أعلاه، والصادر منكم لصالحنا على حساب شركة رؤية القوى للمصاعد
+              بمبلغ قدره (20,000.00) ريال، نأمل منكم تمديد فترة سريان الضمان حتى تاريخ 30 يوليو 2026م مع بقاء
+              الشروط الأخرى دون تغيير، وإفادتنا بذلك من خلال البريد الإلكتروني المخصص للضمانات البنكية لدى
+              مستشفى الملك فيصل التخصصي ومركز الأبحاث بالرياض (bgfinance@kfshrc.edu.sa)، كما نأمل منكم إرسال أصل
+              تمديد الضمان إلى العنوان التالي:
+            </p>
+
+            <div class="preview-address-box">
+              <div>مستشفى الملك فيصل التخصصي ومركز الأبحاث - الرياض</div>
+              <div>ص.ب 3354 الرياض 11211</div>
+              <div>مكتب الخدمات الإدارية</div>
+            </div>
+
+            <p class="letter-paragraph">
+              علمًا بأنه في حال عدم تمكن البنك من تمديد الضمان المذكور قبل انتهاء مدة سريانه فيجب على البنك دفع
+              قيمة الضمان إلينا حسب النظام.
+            </p>
+          </div>
+
+          <div class="preview-clearfix">
+            <div class="letter-line preview-note">وَتفضَّلوا بِقبُول خَالِص تحيَّاتي</div>
+            <div class="preview-signature">
+              <div>مُدير الإدارة العامَّة للعمليَّات المحاسبيَّة</div>
+              <div class="signature-seal">سَامي بن عبَّاس الفايز</div>
+            </div>
+          </div>
+        </article>
+      </section>
+    </div>
+    <!-- توقيع أو تذييل داخلي ضمن نفس الورقة -->
+    <div class="sheet-footer" id="sheetFooter" aria-label="معلومات إضافية في التذييل">
+      <span class="footer-left" id="footerLeftField" contenteditable="false">MBC: 9-2</span>
+      <span class="footer-right" id="footerRightField" contenteditable="false">BAMZ</span>
+    </div>
+  </main>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script>
+    // مراجع DOM الرئيسة التي نحتاجها للتصدير
+    const letterSheet = document.getElementById('letterSheetCanvas');
+    const btn = document.getElementById('downloadBtn');
+
+    // تحديث نص الزر وحالته لعرض التغذية البصرية للمستخدم
+    function setButtonState(message, disabled = false) {
+      btn.textContent = message;
+      btn.disabled = disabled;
+      btn.style.opacity = disabled ? 0.5 : 1;
+    }
+
+    // يتحقق من جاهزية المكتبات والصورة قبل السماح بالتصدير
+    function evaluateReadyState() {
+      if (typeof html2canvas === 'undefined' || typeof window.jspdf === 'undefined') {
+        setButtonState('تعذر تحميل محرك PDF', true);
+        return false;
+      }
+
+      setButtonState('تحميل PDF');
+      return true;
+    }
+
+    evaluateReadyState();
+
+    btn.addEventListener('click', async () => {
+      if (!evaluateReadyState()) {
+        return;
+      }
+
+      setButtonState('جاري التحويل...', true);
+      try {
+        // تحويل الورقة إلى صورة ثم تضمينها داخل ملف PDF واحد
+        const canvas = await html2canvas(letterSheet, {
+          scale: 2,
+          useCORS: true,
+          allowTaint: true,
+          scrollX: 0,
+          scrollY: -window.scrollY
+        });
+
+        const imgData = canvas.toDataURL('image/png');
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF({
+          orientation: 'portrait',
+          unit: 'mm',
+          format: 'a4'
+        });
+        const pageWidth = pdf.internal.pageSize.getWidth();
+        const pageHeight = pdf.internal.pageSize.getHeight();
+        pdf.addImage(imgData, 'PNG', 0, 0, pageWidth, pageHeight);
+        pdf.save('letter.pdf');
+        setButtonState('تحميل PDF');
+      } catch (error) {
+        console.error(error);
+        setButtonState('حدث خطأ، أعد المحاولة', false);
+      }
+    });
+  </script>
+</body>
+</html>

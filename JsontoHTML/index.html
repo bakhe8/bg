@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>طلب تمديد الضمان البنكي - M113528</title>
+    <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="instructions">
+            <p>يمكنك تعديل الأجزاء الحمراء فقط في هذا المستند بالنقر عليها. بعد التعديل، يمكنك حفظ المستند كملف PDF أو طباعته.</p>
+        </div>
+        
+        <div class="controls">
+            <button onclick="printDocument()">طباعة المستند</button>
+            <button onclick="saveAsPDF()">حفظ كـ PDF</button>
+            <button onclick="createHTML()">إنشاء صفحة HTML</button>
+            <button onclick="resetDocument()">إعادة التعيين</button>
+        </div>
+        
+        <div class="header">
+            <div class="recipient">
+                <div class="bold">السـادة / 
+                    <select class="bank-select" id="bankSelect">
+                        <option value="alahli">البنك الأهلي السعودي</option>
+                        <option value="sabb">البنك السعودي البريطاني</option>
+                        <option value="anb">البنك العربي الوطني</option>
+                        <option value="alrajhi">مصرف الراجحي</option>
+                        <option value="samba">البنك السعودي للاستثمار</option>
+                        <option value="riyad">بنك الرياض</option>
+                        <option value="alfransi">البنك السعودي الفرنسي</option>
+                        <option value="alawwal">البنك الأول</option>
+                        <option value="inma">بنك الإنماء</option>
+                        <option value="aljazira">بنك الجزيرة</option>
+                    </select>
+                </div>
+            </div>
+            <div class="salutation">
+                <div>المحترمين</div>
+            </div>
+        </div>
+        
+        <div class="sender-info">
+            <div class="bold" id="senderName">مركز خدمات التجارة - البنك الأهلي السعودي</div>
+            <div id="senderAddress">ص.ب. 3555 جده 21481</div>
+            <div id="senderEmail">بريد الكتروني: tradej-lg@alahli.com</div>
+        </div>
+        
+        <div class="greeting">
+            <div>السَّلام عليكُم ورحمَة الله وبركاتِه</div>
+        </div>
+        
+        <div class="subject">
+            <div class="subject-label">الموضوع:</div>
+            <div>
+                طلب تمديد الضمان البنكي رقم (<span class="editable" contenteditable="true">M113528</span>) والعائد للعقد رقم (<span class="editable" contenteditable="true">434153</span>).
+            </div>
+        </div>
+        
+        <div class="content">
+            <p>
+                إشارة الى الضمان البنكي النهائي الموضح أعلاه، والصادر منكم لصالحنا على حساب شركة رؤية القوى للمصاعد 
+                بمبلغ قدرة (<span class="editable" contenteditable="true">20.000.00</span>) ريال نأمل منكم تمديد فترة سريان الضمان حتى تاريخ 
+                <span class="editable" contenteditable="true">30 يوليو 2026م</span>، 
+                مع بقاء الشروط الأخرى دون تغيير، وإفادتنا بذلك من خلال البريد الالكتروني المخصص للضمانات البنكية لدى مستشفى 
+                الملك فيصل التخصصي ومركز الأبحاث بالرياض (bgfinance@kfshrc.edu.sa)، 
+                كما نأمل منكم إرسال أصل تمديد الضمان الى:
+            </p>
+            
+            <div class="address-box">
+                <div class="bold">مستشفى الملك فيصل التخصصي ومركز الأبحاث - الرياض</div>
+                <div>ص.ب 3354 الرياض 11211</div>
+                <div>مكتب الخدمات الإدارية</div>
+            </div>
+            
+            <p>
+                علمًا بأنه في حال عدم تمكن البنك من تمديد الضمان المذكور قبل إنتهاء مدة سريانه فيجب على البنك دفع 
+                قيمة الضمان الينا حسب النظام.
+            </p>
+            
+            <p style="margin-top: 25px;">وَتفضَّلوا بِقبُول خَالِص تحيَّاتي</p>
+        </div>
+        
+        <div class="clearfix">
+            <div class="signature">
+                <div class="bold">مُدير الإدارة العامَّة للعمليَّات المحاسبيَّة</div>
+                <div class="bold">سَامِي بن عبَّاس الفايز</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="data/bank-data.js"></script>
+    <script src="js/script.js"></script>
+</body>
+</html>

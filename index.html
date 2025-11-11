@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>نظام خطابات الضمان + أداة Excel</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>📄 نظام خطابات الضمان البنكية</h1>
+
+  <!-- أداة رفع Excel -->
+  <section id="excel-section" style="margin:20px; padding:15px; border:1px solid #ccc; border-radius:10px;">
+    <h3>📊 استيراد ملف Excel وتحويله إلى JSON</h3>
+    <input type="file" id="excelFile" accept=".xlsx,.xls" />
+    <button id="convertBtn">تحويل</button>
+    <button id="importBtn" style="display:none;">استيراد للواجهة</button>
+    <pre id="jsonOutput" style="background:#f8f8f8; padding:10px; border-radius:8px; margin-top:10px; overflow:auto; max-height:300px;"></pre>
+  </section>
+
+  <hr>
+
+  <!-- واجهة الخطاب الأصلية -->
+  <h2>اختيار البنك:</h2>
+  <select id="bankSelect"></select>
+
+  <h3>محتوى الخطاب:</h3>
+  <div id="letterContent" contenteditable="true" style="border:1px solid #ccc; padding:15px; border-radius:8px;">
+    <p>نص الخطاب هنا...</p>
+  </div>
+
+  <button onclick="printLetter()">🖨️ طباعة الخطاب</button>
+
+  <script src="bank-data.js"></script>
+  <script src="script.js"></script>
+  <script src="integrated-tool.js"></script>
+</body>
+</html>
