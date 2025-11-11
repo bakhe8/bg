@@ -30,6 +30,15 @@
       font-display: swap;
     }
 
+    /* خط لاتيني مخصص للتذييل */
+    @font-face {
+      font-family: 'RobotoCondensed';
+      src: url("assets/RobotoCondensed-Light.ttf") format("truetype");
+      font-weight: 300;
+      font-style: normal;
+      font-display: swap;
+    }
+
     :root {
       --font-primary: 'AlMohanad', sans-serif;
       --page-width: 210mm;
@@ -53,6 +62,7 @@
       font-size: 20px;
       font-weight: 800;
       line-height: 1.2;
+      font-feature-settings: "anum";
       min-height: 100vh;
       display: flex;
       flex-direction: column;
@@ -126,9 +136,8 @@
       line-height: inherit;
     }
 
-    /* تخصيص موحّد للنصوص الإنجليزية */
-    .writing-area :lang(en),
-    .sheet-footer :lang(en) {
+    /* تخصيص موحّد للنصوص الإنجليزية عبر كامل الصفحة */
+    body :lang(en) {
       font-family: var(--latin-font-family);
       font-size: var(--latin-font-size);
       font-weight: var(--latin-font-weight);
@@ -137,6 +146,7 @@
       direction: ltr;
       text-align: left;
       display: inline-block;
+      font-feature-settings: "anum";
     }
 
     /* كل سطر منفصل مع تباعد متساوٍ */
@@ -154,15 +164,20 @@
      }
 
     /* التذييل */
+    .sheet-footer,
+    .sheet-footer * {
+      font-family: 'RobotoCondensed', 'Segoe UI', 'Segoe UI Narrow', Tahoma, sans-serif !important;
+      font-feature-settings: normal;
+    }
+
     .sheet-footer {
       margin: -5mm 20mm 20mm 20mm;
       border: none;
       background: transparent;
       outline: none;
-      font-family: var(--font-primary);
       font-size: 10px;
-      font-weight: 400;
-      line-height: 1.4;
+      font-weight: 300;
+      line-height: 1;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -174,6 +189,14 @@
       flex: 1;
       display: inline-block;
       white-space: pre-wrap;
+    }
+
+    #footerLeftField,
+    #footerRightField {
+      font-family: 'RobotoCondensed', 'Segoe UI', 'Segoe UI Narrow', Tahoma, sans-serif !important;
+      font-weight: 300;
+      font-size: 11px;
+      letter-spacing: 0.05em;
     }
 
     .sheet-footer .footer-left {
@@ -296,7 +319,7 @@
 
   </style>
 </head>
-<body id="pageRoot">
+<body id="pageRoot" data-eastern-digits="true">
   <!-- شريط الأدوات للتحكم بعملية التصدير -->
   <div class="toolbar" id="actionToolbar">
     <button id="downloadBtn" aria-controls="letterSheetCanvas">استخراج PDF</button>
@@ -376,6 +399,32 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script>
+    // ثابت يحول أي رقم لاتيني إلى نظيره الهندي
+    const EASTERN_DIGITS = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
+
+    function toEasternDigits(text = '') {
+      return text.replace(/\d/g, digit => EASTERN_DIGITS[Number(digit)]);
+    }
+
+    // يجول داخل عقد النص ويحافظ على وسوم <script>/<style> دون تعديل
+    function convertDigitsInNode(root) {
+      if (!root) return;
+      const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+      while (walker.nextNode()) {
+        const current = walker.currentNode;
+        const parent = current.parentElement;
+        if (parent && (parent.tagName === 'SCRIPT' || parent.tagName === 'STYLE')) {
+          continue;
+        }
+        if (parent && parent.closest('.sheet-footer')) {
+          continue;
+        }
+        if (/\d/.test(current.nodeValue)) {
+          current.nodeValue = toEasternDigits(current.nodeValue);
+        }
+      }
+    }
+
     // مراجع DOM الرئيسة التي نحتاجها للتصدير
     const letterSheet = document.getElementById('letterSheetCanvas');
     const btn = document.getElementById('downloadBtn');
@@ -396,6 +445,10 @@
 
       setButtonState('تحميل PDF');
       return true;
+    }
+
+    if (document.body?.dataset?.easternDigits === 'true') {
+      convertDigitsInNode(document.body);
     }
 
     evaluateReadyState();
