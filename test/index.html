@@ -5,9 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ورقة اختبار خطابات الضمان</title>
   <style>
-    /* تحميل عائلة الخط بأوزان متعددة للاستخدام داخل المستند */
+    /* تحميل الخط بأوزان متعددة */
     @font-face {
-      font-family: 'AlMohanad-Regular';
+      font-family: 'AlMohanad';
       src: url("assets/AL-Mohanad.ttf") format("truetype");
       font-weight: 400;
       font-style: normal;
@@ -15,28 +15,26 @@
     }
 
     @font-face {
-      font-family: 'AlMohanad-Bold';
+      font-family: 'AlMohanad';
       src: url("assets/AL-Mohanad Bold.ttf") format("truetype");
-      font-weight: 600;
+      font-weight: 800;
       font-style: normal;
       font-display: swap;
     }
 
     @font-face {
-      font-family: 'AlMohanad-ExtraBold';
+      font-family: 'AlMohanad';
       src: url("assets/AL-Mohanad Extra Bold.ttf") format("truetype");
-      font-weight: 700;
+      font-weight: 1000;
       font-style: normal;
       font-display: swap;
     }
 
     :root {
-      --font-regular: 'AlMohanad-Regular', 'Segoe UI', Tahoma, sans-serif;
-      --font-bold: 'AlMohanad-Bold', 'Segoe UI', Tahoma, sans-serif;
-      --font-extrabold: 'AlMohanad-ExtraBold', 'Segoe UI', Tahoma, sans-serif;
+      --font-primary: 'AlMohanad', sans-serif;
       --page-width: 210mm;
       --page-height: 297mm;
-      --subject-accent: rgba(0, 0, 0, 0.08);
+      --subject-accent: #aab4aa;
     }
 
     /* ضبط القيم الافتراضية */
@@ -47,8 +45,10 @@
     /* إعداد الخلفية والهيكل العام للصفحة */
     body {
       margin: 0;
-      font-family: var(--font-bold);
-      line-height: 1.8;
+      font-family: var(--font-primary);
+      font-size: 20px;
+      font-weight: 800;
+      line-height: 1.2;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
@@ -116,6 +116,12 @@
       flex: 1;
     }
 
+    .writing-area * {
+      font-size: inherit;
+      font-weight: inherit;
+      line-height: inherit;
+    }
+
     /* كل سطر منفصل مع تباعد متساوٍ */
     .letter-line {
       margin-bottom: 4mm;
@@ -136,8 +142,10 @@
       border: none;
       background: transparent;
       outline: none;
-      font-family: var(--font-regular);
-      font-size: 0.6rem;
+      font-family: var(--font-primary);
+      font-size: 10px;
+      font-weight: 400;
+      line-height: 1.4;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -163,19 +171,27 @@
     .preview-container {
       display: flex;
       flex-direction: column;
-      gap: 1mm;
+      gap: 3mm;
     }
 
     .preview-header {
       display: flex;
       justify-content: space-between;
-      gap: 1mm;
       align-items: flex-start;
+      margin: 0;
+    }
+
+    .preview-recipient-name div {
+      font-weight: 900;
+      font-size: 17px;
+    }
+
+    .preview-salutation div {
+      margin: 0;
     }
 
     .preview-recipient {
       flex: 1;
-      line-height: 1.6;
     }
 
     .preview-salutation {
@@ -186,7 +202,7 @@
     .preview-subject {
       background: var(--subject-accent);
       display: flex;
-      gap: 8px;
+      gap: 2px;
       padding: 0;
     }
 
@@ -203,7 +219,7 @@
     .preview-content {
       display: flex;
       flex-direction: column;
-      gap: 1mm;
+      gap: 2mm;
     }
 
     .preview-greeting {
@@ -212,7 +228,7 @@
 
     .preview-address-box {
       margin: 0;
-      padding-right: 30px;
+      padding-right: 50px;
     }
 
     /* توقيع */
@@ -223,14 +239,19 @@
 
     .preview-signature {
       text-align: center;
-      margin-right: 300px;
+      margin-right: 350px;
       display: flex;
       flex-direction: column;
       gap: 1mm;
     }
 
+    .preview-signature > div {
+      font-weight: 900;
+      font-size: 17px;
+    }
+
     .preview-signature div + .signature-seal {
-      margin-top: 15mm;
+      margin-top: 50px;
     }
 
     @media print {
@@ -245,9 +266,14 @@
         min-height: auto;
         align-items: initial;
         justify-content: flex-start;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
       }
       #actionToolbar {
         display: none !important;
+      }
+      .preview-subject {
+        background: var(--subject-accent) !important;
       }
     }
 
@@ -281,7 +307,6 @@
             <div>البريد الإلكتروني: tradej-lg@alahli.com</div>
           </div>
 
-
           <div class="preview-greeting">
             <div>السَّلام عليكُم ورحمَة الله وبركاتِه</div>
           </div>
@@ -301,9 +326,11 @@
             </p>
 
             <div class="preview-address-box">
-              <div>مستشفى الملك فيصل التخصصي ومركز الأبحاث - الرياض</div>
-              <div>ص.ب 3354 الرياض 11211</div>
-              <div>مكتب الخدمات الإدارية</div>
+              <div class="preview-recipient">
+                <div>مستشفى الملك فيصل التخصصي ومركز الأبحاث - الرياض</div>
+                <div>ص.ب 3354 الرياض 11211</div>
+                <div>مكتب الخدمات الإدارية</div>
+              </div>
             </div>
 
             <p class="letter-paragraph">
