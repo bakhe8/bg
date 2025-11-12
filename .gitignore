@@ -1,3 +1,5 @@
-﻿__pycache__/
+__pycache__/
 *.pyc
 .venv/
+main/data/archives/*
+!main/data/archives/.gitkeep
