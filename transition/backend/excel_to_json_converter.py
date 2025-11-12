@@ -8,6 +8,7 @@ import warnings
 
 from .data_cleaner import DataCleaner
 from .data_validator import DataValidator
+from .reference_loader import load_column_aliases, load_bank_reference
 
 # كتم تحذيرات pandas غير الضرورية
 warnings.filterwarnings('ignore')
@@ -19,6 +20,11 @@ class ExcelToJsonConverter:
         self.optimize_memory = optimize_memory
         self.cleaner = DataCleaner()
         self.validator = DataValidator()
+        self.column_aliases = load_column_aliases()
+        self.column_lookup = self._build_column_lookup(self.column_aliases)
+        self.required_columns = list(self.column_aliases.keys())
+        self.bank_reference = load_bank_reference()
+        self.bank_lookup = self._build_bank_lookup(self.bank_reference)
         
         # التحقق من وجود المكتبات المطلوبة
         self.check_dependencies()
@@ -210,9 +216,11 @@ class ExcelToJsonConverter:
             data = self.read_excel_optimized(excel_file, sheet_name)
             
             if sheet_name == "all":
-                return self.process_multiple_sheets(data, excel_file, output_file)
+                result = self.process_multiple_sheets(data, excel_file, output_file)
             else:
-                return self.process_single_sheet(data, excel_file, sheet_name, output_file)
+                result = self.process_single_sheet(data, excel_file, sheet_name, output_file)
+            del data
+            return result
             
         except FileNotFoundError as e:
             raise e
@@ -235,8 +243,10 @@ class ExcelToJsonConverter:
         else:
             df_processed = df
         
+        df_model = self._prepare_model_frame(df_processed)
+        
         # كشف أنواع البيانات
-        data_types = self.detect_data_types_improved(df_processed)
+        data_types = self.detect_data_types_improved(df_model)
         
         # إعداد البيانات النهائية
         result_data = {
@@ -244,14 +254,15 @@ class ExcelToJsonConverter:
                 "file_name": os.path.basename(excel_file),
                 "sheet_name": sheet_name,
                 "conversion_date": datetime.now().isoformat(),
-                "records_count": len(df_processed),
-                "columns_count": len(df_processed.columns),
+                "records_count": len(df_model),
+                "columns_count": len(df_model.columns),
                 "cleaning_applied": self.clean_data
             },
             "data_types": data_types,
-            "columns": list(df_processed.columns),
-            "records": self.prepare_records(df_processed, data_types)
+            "columns": list(df_model.columns),
+            "records": self.prepare_records(df_model, data_types)
         }
+        del df_processed, df_model
         
         return self.save_output(result_data, output_file)
     
@@ -266,18 +277,20 @@ class ExcelToJsonConverter:
                 df_clean = self.clean_data_smart(df)
             else:
                 df_clean = df
+            df_model = self._prepare_model_frame(df_clean)
             
-            data_types = self.detect_data_types_improved(df_clean)
+            data_types = self.detect_data_types_improved(df_model)
             
             all_sheets_data[sheet_name] = {
                 "metadata": {
-                    "records_count": len(df_clean),
-                    "columns_count": len(df_clean.columns),
+                    "records_count": len(df_model),
+                    "columns_count": len(df_model.columns),
                     "cleaning_applied": self.clean_data
                 },
                 "data_types": data_types,
-                "records": self.prepare_records(df_clean, data_types)
+                "records": self.prepare_records(df_model, data_types)
             }
+            del df_clean, df_model
         
         result_data = {
             "file_info": {
@@ -290,6 +303,76 @@ class ExcelToJsonConverter:
         }
         
         return self.save_output(result_data, output_file)
+    
+    def _build_column_lookup(self, alias_map):
+        lookup = {}
+        for canonical, aliases in alias_map.items():
+            for alias in aliases:
+                lookup[alias] = canonical
+        return lookup
+
+    def _build_bank_lookup(self, entries):
+        lookup = {}
+        for entry in entries:
+            arabic = entry.get("arabic", "").strip()
+            if not arabic:
+                continue
+            lookup[arabic.lower()] = arabic
+            for alias in entry.get("aliases", []):
+                lookup[alias] = arabic
+        return lookup
+
+    def _normalize_label(self, label):
+        return " ".join(str(label).strip().lower().split())
+
+    def _prepare_model_frame(self, frame):
+        normalized = self._normalize_columns(frame)
+        standardized = self._standardize_fields(normalized)
+        return standardized
+
+    def _normalize_columns(self, frame):
+        rename_map = {}
+        for column in frame.columns:
+            canonical = self.column_lookup.get(self._normalize_label(column))
+            if canonical:
+                rename_map[column] = canonical
+        normalized = frame.rename(columns=rename_map)
+        missing = [col for col in self.required_columns if col not in normalized.columns]
+        if missing:
+            raise ValueError(f"الأعمدة الإلزامية مفقودة: {', '.join(missing)}")
+        return normalized[self.required_columns].copy()
+
+    def _standardize_fields(self, frame):
+        df = frame.copy()
+        df['bank_name'] = df['bank_name'].apply(self._normalize_bank_name)
+        df['guarantee_number'] = df['guarantee_number'].apply(self._normalize_text_field)
+        df['contract_number'] = df['contract_number'].apply(self._normalize_text_field)
+        df['company_name'] = df['company_name'].apply(self._normalize_text_field)
+        df['amount'] = df['amount'].apply(self._format_amount_field)
+        df['validity_date'] = pd.to_datetime(df['validity_date'], errors='coerce')
+        if df['validity_date'].isna().any():
+            raise ValueError("تعذر قراءة بعض تواريخ انتهاء الضمان")
+        df['validity_date'] = df['validity_date'].dt.strftime('%Y-%m-%d')
+        return df
+
+    def _normalize_bank_name(self, value):
+        text = self._normalize_text_field(value)
+        if not text:
+            return text
+        return self.bank_lookup.get(text.lower(), text)
+
+    def _normalize_text_field(self, value):
+        if value is None:
+            return ""
+        return str(value).strip()
+
+    def _format_amount_field(self, value):
+        text = self.cleaner.normalize_numeric_strings(str(value))
+        try:
+            numeric = float(text)
+        except ValueError as exc:
+            raise ValueError(f"قيمة مبلغ غير صالحة: {value}") from exc
+        return f"{numeric:,.2f}"
     
     def prepare_records(self, df, data_types):
         """تحضير السجلات مع الحفاظ على التنسيق"""

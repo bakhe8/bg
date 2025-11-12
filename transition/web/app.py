@@ -7,9 +7,9 @@ from flask import Flask
 
 from transition.web.routes import register_all_routes
 
-BASE_DIR = Path(__file__).resolve().parent.parent
-WEB_DIR = BASE_DIR / "main" / "bg_ui"
-ARCHIVE_DIR = BASE_DIR / "main" / "data" / "archives"
+ROOT_DIR = Path(__file__).resolve().parents[2]
+WEB_DIR = ROOT_DIR / "main" / "bg_ui"
+ARCHIVE_DIR = ROOT_DIR / "main" / "data" / "archives"
 ARCHIVE_DIR.mkdir(exist_ok=True)
 
 app = Flask(

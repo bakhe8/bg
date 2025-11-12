@@ -163,13 +163,14 @@ class TestIntegration(unittest.TestCase):
         """اختبار التحويل الكامل من Excel إلى JSON"""
         converter = ExcelToJsonConverter(clean_data=True)
         
-        # إنشاء بيانات اختبارية متنوعة
+        # إنشاء بيانات اختبارية تتوافق مع الأعمدة المعتمدة
         test_data = {
-            'ID': ['001', '002', '003'],
-            'الاسم': ['أحمد', 'محمد', 'فاطمة'],
-            'الراتب': [5000, 6000, 7000],
-            'الحساب': ['000123', '000456', '000789'],
-            'ملاحظات': ['', 'تفاصيل إضافية', '']
+            'Bank Name': ['Riyad Bank', 'SNB', 'BANQUE SAUDI FRANSI'],
+            'Bank Guarantee Number': ['RG123', 'SNB456', 'BSF789'],
+            'Contract No.': ['PO-001', 'PO-002', 'PO-003'],
+            'Amount': ['100000', '250000.50', '77500'],
+            'Validity Date': ['2025-12-31', '2026-01-05', '2026-02-10'],
+            'Contractor Name': ['شركة ألف', 'شركة باء', 'شركة جيم']
         }
         df = pd.DataFrame(test_data)
         
@@ -193,8 +194,13 @@ class TestIntegration(unittest.TestCase):
             
             # التحقق من البيانات
             self.assertEqual(len(json_data['records']), 3)
-            self.assertEqual(json_data['records'][0]['ID'], '001')
-            self.assertEqual(json_data['records'][0]['الاسم'], 'أحمد')
+            first = json_data['records'][0]
+            self.assertEqual(first['bank_name'], 'بنك الرياض')
+            self.assertEqual(first['guarantee_number'], 'RG123')
+            self.assertEqual(first['contract_number'], 'PO-001')
+            self.assertEqual(first['amount'], '100,000.00')
+            self.assertEqual(first['validity_date'], '2025-12-31')
+            self.assertEqual(first['company_name'], 'شركة ألف')
             
         finally:
             # تنظيف

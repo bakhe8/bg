@@ -1,0 +1,30 @@
+﻿[
+  {
+    "arabic": "البنك الأهلي السعودي",
+    "aliases": ["national commercial bank", "alahli", "snb", "nbc", "البنك الأهلي"]
+  },
+  {
+    "arabic": "بنك الرياض",
+    "aliases": ["riyad bank", "riyadh bank", "بنك الرياض"]
+  },
+  {
+    "arabic": "البنك العربي الوطني",
+    "aliases": ["anb", "arab national bank", "البنك العربي الوطني"]
+  },
+  {
+    "arabic": "البنك السعودي البريطاني",
+    "aliases": ["sabb", "sabb bank", "البنك السعودي البريطاني"]
+  },
+  {
+    "arabic": "البنك السعودي الفرنسي",
+    "aliases": ["banque saudi fransi", "bsf", "البنك السعودي الفرنسي"]
+  },
+  {
+    "arabic": "مصرف الراجحي",
+    "aliases": ["alrajhi", "al rajhi bank", "مصرف الراجحي"]
+  },
+  {
+    "arabic": "بنك الإنماء",
+    "aliases": ["alinma", "al inma", "بنك الإنماء"]
+  }
+]
