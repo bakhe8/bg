@@ -6,6 +6,9 @@ import argparse
 from datetime import datetime
 import warnings
 
+from .data_cleaner import DataCleaner
+from .data_validator import DataValidator
+
 # كتم تحذيرات pandas غير الضرورية
 warnings.filterwarnings('ignore')
 
@@ -14,6 +17,8 @@ class ExcelToJsonConverter:
         self.supported_formats = ['.xlsx', '.xls']
         self.clean_data = clean_data
         self.optimize_memory = optimize_memory
+        self.cleaner = DataCleaner()
+        self.validator = DataValidator()
         
         # التحقق من وجود المكتبات المطلوبة
         self.check_dependencies()
@@ -77,18 +82,14 @@ class ExcelToJsonConverter:
         
         # تنظيف انتقائي - إزالة الصفوف التي تكون فارغة تماماً فقط
         initial_rows = len(df_clean)
-        df_clean = df_clean.dropna(how='all')
+        df_clean = self.cleaner.remove_empty_rows(df_clean)
         removed_rows = initial_rows - len(df_clean)
         
         if removed_rows > 0:
             print(f"   🧹 تم إزالة {removed_rows} صف فارغ تماماً")
         
         # تنظيف المسافات الزائدة في النصوص فقط
-        text_columns = df_clean.select_dtypes(include=['object']).columns
-        for col in text_columns:
-            df_clean[col] = df_clean[col].apply(
-                lambda x: x.strip() if isinstance(x, str) else x
-            )
+        df_clean = self.cleaner.strip_text_columns(df_clean)
         
         return df_clean
     
@@ -296,8 +297,8 @@ class ExcelToJsonConverter:
         for _, row in df.iterrows():
             record = {}
             for col in df.columns:
-                value = row[col]
-                if pd.isna(value):
+                value = self.validator.coerce_none(row[col])
+                if value is None:
                     record[col] = None
                     continue
                 

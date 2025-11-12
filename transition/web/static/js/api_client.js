@@ -1,0 +1,1 @@
+﻿export async function uploadExcel(file){const body=new FormData();body.append('file',file);const res=await fetch('/api/convert',{method:'POST',body});if(!res.ok) throw new Error('API request failed');return res.json();}
