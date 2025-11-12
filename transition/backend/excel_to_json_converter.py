@@ -163,10 +163,14 @@ class ExcelToJsonConverter:
         else:
             final_type = "mixed"
         
+        sample_value = sample_data[0] if sample_data else ""
+        if pd.isna(sample_value):
+            sample_value = ""
+
         return {
             "type": final_type,
             "types_found": list(types_found),
-            "sample": sample_data[0] if sample_data else "",
+            "sample": sample_value,
             "numeric_ratio": numeric_count / total_non_empty,
             "text_ratio": text_count / total_non_empty,
             "mixed_types": len(types_found) > 1

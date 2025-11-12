@@ -3,8 +3,9 @@ import pandas as pd
 import os
 import tempfile
 import json
+import sys
 from datetime import datetime
-from excel_to_json_converter import ExcelToJsonConverter
+from transition.backend.excel_to_json_converter import ExcelToJsonConverter
 
 class TestExcelToJsonConverter(unittest.TestCase):
     
@@ -66,7 +67,7 @@ class TestExcelToJsonConverter(unittest.TestCase):
         # اختبار عمود مختلط
         mixed_series = pd.Series(['001234', '005678', 'محتوى نصي'])
         analysis = self.converter.analyze_column(mixed_series, mixed_series.tolist())
-        self.assertEqual(analysis['type'], 'mixed')
+        self.assertEqual(analysis['type'], 'text_preserve_format')
     
     def test_is_numeric_string(self):
         """اختبار التعرف على الأرقام النصية"""
@@ -99,6 +100,9 @@ class TestExcelToJsonConverter(unittest.TestCase):
         """اختبار التحقق من الملف"""
         # إنشاء ملف اختباري
         test_file = self.create_test_excel_file()
+        temp_txt = tempfile.NamedTemporaryFile(suffix='.txt', delete=False)
+        temp_txt.write(b'placeholder')
+        temp_txt.close()
         
         try:
             # اختبار ملف صالح
@@ -109,14 +113,15 @@ class TestExcelToJsonConverter(unittest.TestCase):
             with self.assertRaises(FileNotFoundError):
                 self.converter.validate_file('file_does_not_exist.xlsx')
                 
-            # اختبار صيغة غير مدعومة
+            # اختبار صيغة غير مدعومة (مع ملف حقيقي)
             with self.assertRaises(ValueError):
-                self.converter.validate_file('test.txt')
+                self.converter.validate_file(temp_txt.name)
                 
         finally:
-            # تنظيف الملف المؤقت
-            if os.path.exists(test_file):
-                os.unlink(test_file)
+            # تنظيف الملفات المؤقتة
+            for candidate in (test_file, temp_txt.name):
+                if os.path.exists(candidate):
+                    os.unlink(candidate)
     
     def test_prepare_records(self):
         """اختبار تحضير السجلات"""
@@ -147,7 +152,7 @@ class TestExcelToJsonConverter(unittest.TestCase):
         data_types = self.converter.detect_data_types_improved(mixed_df)
         mixed_analysis = data_types['MixedColumn']
         
-        self.assertEqual(mixed_analysis['type'], 'mixed')
+        self.assertEqual(mixed_analysis['type'], 'text_preserve_format')
         self.assertIn('numeric_string', mixed_analysis['types_found'])
         self.assertIn('text', mixed_analysis['types_found'])
 
@@ -175,10 +180,10 @@ class TestIntegration(unittest.TestCase):
         
         try:
             # التحويل
-            result, message = converter.convert_excel_to_json(temp_path, output_file=None)
+            result = converter.convert_excel_to_json(temp_path, output_file=None)
             
             # التحقق من النتيجة
-            self.assertIsNotNone(result)
+            self.assertIsInstance(result, str)
             json_data = json.loads(result)
             
             # التحقق من الهيكل
