@@ -1,13 +1,7 @@
-﻿from __future__ import annotations
+"""
+Legacy compatibility wrapper for LetterModel.
+"""
 
-from dataclasses import dataclass
-from typing import Optional
+from BGLApp_Refactor.core.pdf.models import LetterModel
 
-
-@dataclass
-class LetterModel:
-    contractor_name: str
-    guarantee_number: str
-    amount: str
-    bank_name: str
-    notes: Optional[str] = None
+__all__ = ["LetterModel"]

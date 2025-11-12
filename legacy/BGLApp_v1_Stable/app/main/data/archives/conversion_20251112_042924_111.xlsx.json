@@ -1,0 +1,575 @@
+{
+  "file_info": {
+    "file_name": "tmpwj75etcj.xlsx",
+    "conversion_date": "2025-11-12T04:29:24.064736+00:00",
+    "total_sheets": 1,
+    "cleaning_applied": true,
+    "unknown_columns": {
+      "Sheet1": [
+        "S/N",
+        "DAYS VALID",
+        "RENEWAL DATE",
+        "Type",
+        "Comment",
+        "Today",
+        "Owner "
+      ]
+    }
+  },
+  "sheets": {
+    "Sheet1": {
+      "metadata": {
+        "records_count": 63,
+        "columns_count": 6,
+        "cleaning_applied": true,
+        "unknown_columns": [
+          "S/N",
+          "DAYS VALID",
+          "RENEWAL DATE",
+          "Type",
+          "Comment",
+          "Today",
+          "Owner "
+        ]
+      },
+      "data_types": {
+        "bank_name": {
+          "type": "text",
+          "sample": "بنك الرياض",
+          "distinct_count": 16
+        },
+        "guarantee_number": {
+          "type": "text",
+          "sample": "RLG6626317",
+          "distinct_count": 63
+        },
+        "contract_number": {
+          "type": "text",
+          "sample": "C/0147/22",
+          "distinct_count": 62
+        },
+        "amount": {
+          "type": "text",
+          "sample": "١٩٦٬٠٠٠٫٠٠",
+          "distinct_count": 63
+        },
+        "validity_date": {
+          "type": "date_like",
+          "sample": "2025-12-01",
+          "distinct_count": 30
+        },
+        "company_name": {
+          "type": "text",
+          "sample": "CURE DEVELOPMENT INTERNATIONAL LTD.",
+          "distinct_count": 57
+        }
+      },
+      "records": [
+        {
+          "bank_name": "بنك الرياض",
+          "guarantee_number": "RLG6626317",
+          "contract_number": "C/0147/22",
+          "amount": "١٩٦٬٠٠٠٫٠٠",
+          "validity_date": "2025-12-01",
+          "company_name": "CURE DEVELOPMENT INTERNATIONAL LTD."
+        },
+        {
+          "bank_name": "بنك الرياض",
+          "guarantee_number": "RLG6617038",
+          "contract_number": "C/M0007/22",
+          "amount": "٧٠٠٬٠٠٠٫٠٠",
+          "validity_date": "2025-12-01",
+          "company_name": "شركة الحلول المتسارعة للاتصالات و تقنية المعلومات"
+        },
+        {
+          "bank_name": "SAB",
+          "guarantee_number": "APNGCU440713",
+          "contract_number": "C/0259/23",
+          "amount": "١٥٬١٠١٫٠٠",
+          "validity_date": "2025-12-03",
+          "company_name": "DIVERSEY SAUDI ARABIA LIMITED CO,"
+        },
+        {
+          "bank_name": "البنك العربي الوطني",
+          "guarantee_number": "OGEE031069",
+          "contract_number": "C/0032/42",
+          "amount": "٩٤٬١٠٠٫٠٠",
+          "validity_date": "2025-12-05",
+          "company_name": "SAMA MASA TRADING COMPANY."
+        },
+        {
+          "bank_name": "البنك السعودي الفرنسي",
+          "guarantee_number": "089481J",
+          "contract_number": "C/0025/22",
+          "amount": "٥٠٦٬٠٧٥٫٠٠",
+          "validity_date": "2025-12-05",
+          "company_name": "شركة جيل الاداره الحديثه للتجاره"
+        },
+        {
+          "bank_name": "البنك السعودي الفرنسي",
+          "guarantee_number": "074806K",
+          "contract_number": "C/M0012/23",
+          "amount": "٦٤٬٦١٥٫٠٠",
+          "validity_date": "2025-12-05",
+          "company_name": "NAIZAK GLOBAL ENGINEERING SYSTEMS"
+        },
+        {
+          "bank_name": "BNP PARIBAS",
+          "guarantee_number": "04762IGS2201890",
+          "contract_number": "C/0039/43",
+          "amount": "٤٤٠٬١٧١٫٠٠",
+          "validity_date": "2025-12-12",
+          "company_name": "شركة المثلث التقني الكامل"
+        },
+        {
+          "bank_name": "البنك الأهلي السعودي",
+          "guarantee_number": "C230561",
+          "contract_number": "434298",
+          "amount": "٣٠٬٠١٥٫٠٠",
+          "validity_date": "2025-12-14",
+          "company_name": "ARABIAN HEALTH CARE SUPPLY CO."
+        },
+        {
+          "bank_name": "البنك العربي الوطني",
+          "guarantee_number": "OG/CC049152",
+          "contract_number": "C/0127/23",
+          "amount": "١٤٠٬٧١٨٫٠٠",
+          "validity_date": "2025-12-15",
+          "company_name": "AL HADA CONTRACTING CO. LTD"
+        },
+        {
+          "bank_name": "DEUTSCHE BANK",
+          "guarantee_number": "507BGG2500216",
+          "contract_number": "439596",
+          "amount": "٣٢٤٬٥٠٠٫٠٠",
+          "validity_date": "2025-12-15",
+          "company_name": "Branch Office of Mercer Consulting Limited"
+        },
+        {
+          "bank_name": "NCB",
+          "guarantee_number": "B284519",
+          "contract_number": "c/0044/43",
+          "amount": "٧٢٬١٠٥٫٠٠",
+          "validity_date": "2025-12-16",
+          "company_name": "شركة الخليج الطبيه المحدوده"
+        },
+        {
+          "bank_name": "SAB",
+          "guarantee_number": "PEBHOR417111",
+          "contract_number": "C/0149/22",
+          "amount": "١٤٩٬٩٦٠٫٠٠",
+          "validity_date": "2025-12-16",
+          "company_name": "ERNST AND YOUNG PROFISSIONAL SERVICES"
+        },
+        {
+          "bank_name": "البنك الأهلي السعودي",
+          "guarantee_number": "C230884",
+          "contract_number": "C/0047/41",
+          "amount": "٤٣٩٬٩٨٦٫٠٠",
+          "validity_date": "2025-12-16",
+          "company_name": "ABDULREHMAN ALGOSAIBI G.T.C."
+        },
+        {
+          "bank_name": "بنك الرياض",
+          "guarantee_number": "JLG6602162",
+          "contract_number": "C/0008/22",
+          "amount": "٢٦٬٥٩٨٫٠٠",
+          "validity_date": "2025-12-18",
+          "company_name": "FAROUK, MAAMOUN TAMER & CO."
+        },
+        {
+          "bank_name": "بنك الرياض",
+          "guarantee_number": "JLG6605193",
+          "contract_number": "C/M0014/22",
+          "amount": "١١٠٬٠٠٠٫٠٠",
+          "validity_date": "2025-12-21",
+          "company_name": "SAMIR TRADING & MARKETING - CJSC."
+        },
+        {
+          "bank_name": "ALINMA BANK",
+          "guarantee_number": "MD2334500020",
+          "contract_number": "C/0006/24",
+          "amount": "٢٠٢٬٥٠٠٫٠٠",
+          "validity_date": "2025-12-25",
+          "company_name": "GULF GATE TECHNOLOGIES COMPANY LIMITED"
+        },
+        {
+          "bank_name": "البنك الأهلي السعودي",
+          "guarantee_number": "C226305",
+          "contract_number": "C/M0032/23",
+          "amount": "١٩٬٩٠٠٫٠٠",
+          "validity_date": "2025-12-25",
+          "company_name": "ABDULREHMAN ALGOSAIBI G.T.C."
+        },
+        {
+          "bank_name": "SAB",
+          "guarantee_number": "APNCBG523925",
+          "contract_number": "C/0140/22",
+          "amount": "١٬٠٠٠٬٠٠٠٫٠٠",
+          "validity_date": "2025-12-26",
+          "company_name": "ACCUMED SAUDI COMPANY LTD."
+        },
+        {
+          "bank_name": "البنك العربي الوطني",
+          "guarantee_number": "OG/CC038437",
+          "contract_number": "C/0029/43",
+          "amount": "١٬٠٧٨٬٦٢٦٫٠٠",
+          "validity_date": "2025-12-29",
+          "company_name": "AL-FAISALIAH MEDICAL SYSTEMS CO."
+        },
+        {
+          "bank_name": "البنك السعودي الفرنسي",
+          "guarantee_number": "091644J",
+          "contract_number": "C/0121/22",
+          "amount": "٣٢٬٤٤٢٫٠٠",
+          "validity_date": "2025-12-30",
+          "company_name": "GULF MEDICAL CO., LTD."
+        },
+        {
+          "bank_name": "بنك الرياض",
+          "guarantee_number": "JLG6901412",
+          "contract_number": "438913",
+          "amount": "٨٤٬٤١٠٫٠٠",
+          "validity_date": "2025-12-30",
+          "company_name": "ABDULLATIF JAMEEL CO."
+        },
+        {
+          "bank_name": "SAB",
+          "guarantee_number": "PEBGCU509259",
+          "contract_number": "C/0168/23",
+          "amount": "٥٠٬٤٥٢٫٠٠",
+          "validity_date": "2025-12-30",
+          "company_name": "REDA TRADING & DEVELOPMENT CO.MACHINERY AND EQUIPMENT LTD."
+        },
+        {
+          "bank_name": "SAB",
+          "guarantee_number": "APNGCU436326",
+          "contract_number": "C/0181/23",
+          "amount": "٩٨٬٠٠٠٫٠٠",
+          "validity_date": "2025-12-30",
+          "company_name": "HONEYWELL (TURKI ARABIA LIMITED)"
+        },
+        {
+          "bank_name": "ALBILAD BANK",
+          "guarantee_number": "LG2434700022",
+          "contract_number": "435273",
+          "amount": "١٦٬٨٠٠٫٠٠",
+          "validity_date": "2025-12-31",
+          "company_name": "ARAB BUILDERS"
+        },
+        {
+          "bank_name": "ALINMA BANK",
+          "guarantee_number": "MD2301700019",
+          "contract_number": "C/0019/23",
+          "amount": "٣١٦٬٢٣٧٫٣٥",
+          "validity_date": "2025-12-31",
+          "company_name": "Nytrogin Company"
+        },
+        {
+          "bank_name": "ALINMA BANK",
+          "guarantee_number": "MD2435200008",
+          "contract_number": "435472",
+          "amount": "٦٨٬٣٨٥٫٠٠",
+          "validity_date": "2025-12-31",
+          "company_name": "INTERCONTINENTAL HOTEL RIYADH"
+        },
+        {
+          "bank_name": "البنك السعودي الفرنسي",
+          "guarantee_number": "125715R",
+          "contract_number": "C/0117/22",
+          "amount": "٧٬٥٠٠٫٠٠",
+          "validity_date": "2025-12-31",
+          "company_name": "WETICO (Water & Environment Technologies Co. Ltd)"
+        },
+        {
+          "bank_name": "GIB",
+          "guarantee_number": "LGO-363779-23RYD",
+          "contract_number": "C/0274/23",
+          "amount": "٢١٬٠٤٥٫٠٠",
+          "validity_date": "2025-12-31",
+          "company_name": "ARABIAN HEALTH CARE SUPPLY CO."
+        },
+        {
+          "bank_name": "بنك الرياض",
+          "guarantee_number": "RLG6510778",
+          "contract_number": "C/0042/43",
+          "amount": "١٬٩٢٠٬٠٠٠٫٠٠",
+          "validity_date": "2025-12-31",
+          "company_name": "مؤسسة أرزاق السعوديه للتجاره"
+        },
+        {
+          "bank_name": "بنك الرياض",
+          "guarantee_number": "RLG6710084",
+          "contract_number": "C/0323/23",
+          "amount": "٣٤٬٢٣٠٫٠٠",
+          "validity_date": "2025-12-31",
+          "company_name": "AES arabia"
+        },
+        {
+          "bank_name": "بنك الرياض",
+          "guarantee_number": "RLG6900105",
+          "contract_number": "C/0240/23",
+          "amount": "٨٥٬٩١٥٫٩٣",
+          "validity_date": "2025-12-31",
+          "company_name": "Retaj Contracting Co LTD"
+        },
+        {
+          "bank_name": "بنك الرياض",
+          "guarantee_number": "RLG6904604",
+          "contract_number": "C/0084/22",
+          "amount": "٢١٬٨٩٩٫٤٥",
+          "validity_date": "2025-12-31",
+          "company_name": "ORIENT MATERIALS CO."
+        },
+        {
+          "bank_name": "SAB",
+          "guarantee_number": "PEBHOR394494",
+          "contract_number": "C/0056/43",
+          "amount": "٤٬٩٤٢٬١٢٥٫٠٠",
+          "validity_date": "2025-12-31",
+          "company_name": "Mckinsey and Company Lme Limted"
+        },
+        {
+          "bank_name": "البنك الأهلي السعودي",
+          "guarantee_number": "C218471",
+          "contract_number": "C/M0012/22",
+          "amount": "٢٥٠٬٠٠٠٫٠٠",
+          "validity_date": "2025-12-31",
+          "company_name": "Hadef Information Technology Co."
+        },
+        {
+          "bank_name": "البنك الأهلي السعودي",
+          "guarantee_number": "B294752",
+          "contract_number": "C/M0017/22",
+          "amount": "٩٦٬٥٠٠٫٠٠",
+          "validity_date": "2025-12-31",
+          "company_name": "ARABIAN SALMIYA TRADING EST."
+        },
+        {
+          "bank_name": "البنك الأهلي السعودي",
+          "guarantee_number": "B294750",
+          "contract_number": "C/M0016/22",
+          "amount": "٢٠٬٧٠٠٫٠٠",
+          "validity_date": "2025-12-31",
+          "company_name": "ARABIAN SALMIYA TRADING EST."
+        },
+        {
+          "bank_name": "البنك الأهلي السعودي",
+          "guarantee_number": "C226205",
+          "contract_number": "C/M0034/23",
+          "amount": "٢٢٬٥٠٠٫٠٠",
+          "validity_date": "2025-12-31",
+          "company_name": "MEDICAL SUPPLIES & SERVICES CO. LTD. MEDISERV"
+        },
+        {
+          "bank_name": "ALBILAD BANK",
+          "guarantee_number": "LG2516900002",
+          "contract_number": "C/0029/23",
+          "amount": "١٩٬٦٥٦٫٠٠",
+          "validity_date": "2025-12-31",
+          "company_name": "Aldawal System Co. for Information Technology"
+        },
+        {
+          "bank_name": "بنك الرياض",
+          "guarantee_number": "DLG6600658",
+          "contract_number": "C/0021/22",
+          "amount": "٣٤٬٥٠٠٫٠٠",
+          "validity_date": "2026-01-01",
+          "company_name": "شركة سعود عبدالعزيز الشعلان المحدوده"
+        },
+        {
+          "bank_name": "SAB",
+          "guarantee_number": "PEBGCU440605",
+          "contract_number": "C/0253/23",
+          "amount": "٨٬٥٦٣٫٨٢",
+          "validity_date": "2026-01-01",
+          "company_name": "VEOLIA WATER TECHNOLOGIES - SAUDI CONTRACTING"
+        },
+        {
+          "bank_name": "ALINMA BANK",
+          "guarantee_number": "MD2500500005",
+          "contract_number": "5859",
+          "amount": "٩٩٬٢٦٢٫٠٠",
+          "validity_date": "2026-01-05",
+          "company_name": "Integrated Networks Company"
+        },
+        {
+          "bank_name": "البنك السعودي البريطاني",
+          "guarantee_number": "APNGCU420012",
+          "contract_number": "C/0004/23",
+          "amount": "٤٩٧٬٥٠٠٫٠٠",
+          "validity_date": "2026-01-05",
+          "company_name": "Axelerated Solutions CO"
+        },
+        {
+          "bank_name": "البنك السعودي الفرنسي",
+          "guarantee_number": "R129513",
+          "contract_number": "C/M0001/24",
+          "amount": "١٬٥٢٠٬٠٠٠٫٠٠",
+          "validity_date": "2026-01-07",
+          "company_name": "Thabat Construction Company ltd."
+        },
+        {
+          "bank_name": "البنك السعودي الفرنسي",
+          "guarantee_number": "128750R",
+          "contract_number": "C/0238/23",
+          "amount": "٣٢٣٬٩٢٠٫٠٠",
+          "validity_date": "2026-01-08",
+          "company_name": "HADANIA CORPORATION"
+        },
+        {
+          "bank_name": "البنك السعودي البريطاني",
+          "guarantee_number": "APNGCU420330",
+          "contract_number": "C/0017/23",
+          "amount": "٧٧٥٬٠٠٠٫٠٠",
+          "validity_date": "2026-01-09",
+          "company_name": "Axelerated Solutions CO"
+        },
+        {
+          "bank_name": "SAUDI INVESTMENT BANK",
+          "guarantee_number": "ILGSA023747",
+          "contract_number": "C/0014/23",
+          "amount": "٩٬٨٩٦٫٠٠",
+          "validity_date": "2026-01-09",
+          "company_name": "ABDULREHMAN ALGOSAIBI G.T.C."
+        },
+        {
+          "bank_name": "بنك الرياض",
+          "guarantee_number": "RLG6800340",
+          "contract_number": "C/0013/24",
+          "amount": "٨٣٬٣٢٣٫٧٦",
+          "validity_date": "2026-01-10",
+          "company_name": "TADARAK CONSTRUCTION COMPANY"
+        },
+        {
+          "bank_name": "البنك السعودي الفرنسي",
+          "guarantee_number": "091717J",
+          "contract_number": "C/0024/23",
+          "amount": "٧٤٬٣٣٤٫٠٠",
+          "validity_date": "2026-01-15",
+          "company_name": "GULF MEDICAL CO. LTD."
+        },
+        {
+          "bank_name": "SAB",
+          "guarantee_number": "PEBHOR441408",
+          "contract_number": "C/0297/23",
+          "amount": "٤١٧٬٨٢٢٫٠٠",
+          "validity_date": "2026-01-15",
+          "company_name": "Hay Group Saudi Araba Limited"
+        },
+        {
+          "bank_name": "البنك الأهلي السعودي",
+          "guarantee_number": "B303581",
+          "contract_number": "C/M0027/23",
+          "amount": "٥٩٬٨١٥٫٠٠",
+          "validity_date": "2026-01-15",
+          "company_name": "شركة بيتا للاجهزه العلميه المحدوده"
+        },
+        {
+          "bank_name": "ALBILAD BANK",
+          "guarantee_number": "MD2329899008",
+          "contract_number": "C/0057/41",
+          "amount": "١٨٬٩٦٦٫٠٠",
+          "validity_date": "2026-01-17",
+          "company_name": "BAUD TELECOM COMPANY (BTC NETWORKS)"
+        },
+        {
+          "bank_name": "ALRAJHI BANK",
+          "guarantee_number": "23OGTE49100099",
+          "contract_number": "C/0007/23",
+          "amount": "١٨٬٧٢٥٫٠٠",
+          "validity_date": "2026-01-17",
+          "company_name": "Rawafed Taibah"
+        },
+        {
+          "bank_name": "البنك الأهلي السعودي",
+          "guarantee_number": "M110930",
+          "contract_number": "C/0024/24",
+          "amount": "٣٦٬٤٩٩٫٠٠",
+          "validity_date": "2026-01-18",
+          "company_name": "AMDAD SOLUTIONS"
+        },
+        {
+          "bank_name": "Bahrain bank",
+          "guarantee_number": "0000123BGG020043",
+          "contract_number": "C/0025/40",
+          "amount": "٤٬٠٦٣٬٧٧٥٫٠٠",
+          "validity_date": "2026-01-19",
+          "company_name": "ALMARSHD"
+        },
+        {
+          "bank_name": "ALBILAD BANK",
+          "guarantee_number": "MD2304499004",
+          "contract_number": "C/M0002/23",
+          "amount": "٢٤٬٢٧٠٫٧٥",
+          "validity_date": "2026-01-22",
+          "company_name": "Alawour Medical Co. Ltd."
+        },
+        {
+          "bank_name": "Bahrain bank",
+          "guarantee_number": "190013LTGPB",
+          "contract_number": "C/0025/40",
+          "amount": "١١٬٣٤٣٬٢٥٠٫٠٠",
+          "validity_date": "2026-01-25",
+          "company_name": "ALMARSHD"
+        },
+        {
+          "bank_name": "بنك الرياض",
+          "guarantee_number": "DLG6900293",
+          "contract_number": "436003",
+          "amount": "٣٤٥٬٢٨١٫١٨",
+          "validity_date": "2026-01-28",
+          "company_name": "Triple Protection Foundation"
+        },
+        {
+          "bank_name": "ALJAZIRA BANK",
+          "guarantee_number": "LGI-0919-25-4424",
+          "contract_number": "436035",
+          "amount": "٧٬١٨٧٫٥٠",
+          "validity_date": "2026-01-30",
+          "company_name": "TEAM1 ADVANCED COMPANY FOR CONTRACTING"
+        },
+        {
+          "bank_name": "البنك الأهلي السعودي",
+          "guarantee_number": "B280825",
+          "contract_number": "C/0037/40",
+          "amount": "٣٩١٬٥٧٥٫٠٠",
+          "validity_date": "2026-01-30",
+          "company_name": "SAMEER TRADING & SHOPPING"
+        },
+        {
+          "bank_name": "SAB",
+          "guarantee_number": "PEBHOR565791",
+          "contract_number": "443051",
+          "amount": "٢٦٣٬٢٣٥٫٠٠",
+          "validity_date": "2026-01-30",
+          "company_name": "Tahaluf Events Limited"
+        },
+        {
+          "bank_name": "البنك العربي الوطني",
+          "guarantee_number": "OG/CC046034",
+          "contract_number": "C/0022/23",
+          "amount": "١٥٥٬٢٥٠٫٠٠",
+          "validity_date": "2026-01-31",
+          "company_name": "Al-SAGHYIR Trading- Contracting Co."
+        },
+        {
+          "bank_name": "البنك الأهلي السعودي",
+          "guarantee_number": "B304536",
+          "contract_number": "C/0248/23",
+          "amount": "٩٤٬٧٢٩٫٣٤",
+          "validity_date": "2026-01-31",
+          "company_name": "ALSALEM - YORK SERVICES LTD."
+        },
+        {
+          "bank_name": "البنك السعودي الفرنسي",
+          "guarantee_number": "094364G",
+          "contract_number": "C/0143/24",
+          "amount": "٢٨٬٨١٨٫٠٠",
+          "validity_date": "2026-02-02",
+          "company_name": "Saudi NMG"
+        }
+      ]
+    }
+  }
+}

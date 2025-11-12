@@ -1,10 +1,7 @@
-﻿from __future__ import annotations
+"""
+Legacy compatibility wrapper for BankModel.
+"""
 
-from dataclasses import dataclass
+from BGLApp_Refactor.core.pdf.models import BankModel
 
-
-@dataclass
-class BankModel:
-    name: str
-    address: str
-    email: str
+__all__ = ["BankModel"]

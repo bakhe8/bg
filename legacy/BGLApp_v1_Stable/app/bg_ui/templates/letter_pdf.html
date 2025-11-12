@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <style>
+    @font-face {
+      font-family: "AlMohanad";
+      src: url("{{ assets_url }}/AL-Mohanad.ttf") format("truetype");
+    }
+    body {
+      font-family: "AlMohanad", sans-serif;
+      margin: 40px;
+      line-height: 1.5;
+      font-size: 16px;
+    }
+    .header, .footer {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .body {
+      margin-top: 20px;
+    }
+    .subject {
+      background: #e5f0e5;
+      padding: 8px 12px;
+      border-radius: 8px;
+      margin: 16px 0;
+      font-weight: bold;
+    }
+    .signature {
+      margin-top: 40px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div>السادة / {{ bank_name }}</div>
+    <div>المحترمين</div>
+    <div>{{ bank_center }}</div>
+    <div>ص.ب. {{ bank_po_box }}</div>
+    <div>البريد الإلكتروني: {{ bank_email }}</div>
+  </div>
+
+  <div class="body">
+    <div>السَّلام عليكُم ورحمَة الله وبركاتِه</div>
+    <div class="subject">
+      الموضوع: طلب تمديد الضمان البنكي رقم ({{ guarantee_number }}) والعائد للعقد رقم ({{ contract_number }}).
+    </div>
+    <p>
+      إشارة إلى الضمان البنكي النهائي الموضح أعلاه، والصادر منكم لصالحنا على حساب شركة
+      {{ company_name }} بمبلغ قدره ({{ amount }}) ريال،
+      نأمل منكم تمديد فترة سريان الضمان حتى تاريخ {{ validity_date }} مع بقاء الشروط الأخرى دون تغيير،
+      وإفادتنا بذلك من خلال البريد الإلكتروني المخصص للضمانات البنكية لدى مستشفى الملك فيصل التخصصي ومركز الأبحاث بالرياض
+      (<span>bgfinance@kfshrc.edu.sa</span>)، كما نأمل منكم إرسال أصل تمديد الضمان إلى العنوان التالي:
+    </p>
+    <p>
+      مستشفى الملك فيصل التخصصي ومركز الأبحاث - الرياض<br/>
+      ص.ب ٣٣٥٤ الرياض ١١٢١١<br/>
+      مكتب الخدمات الإدارية
+    </p>
+    <p>
+      علمًا بأنه في حال عدم تمكن البنك من تمديد الضمان المذكور قبل انتهاء مدة سريانه فيجب على البنك دفع قيمة الضمان إلينا حسب النظام.
+    </p>
+  </div>
+
+  <div class="signature">
+    <div>وتفضلوا بقبول خالص تحياتنا</div>
+    <div>مدير الإدارة العامة للعمليات المحاسبية</div>
+    <div>سامي بن عباس الفايز</div>
+  </div>
+</body>
+</html>

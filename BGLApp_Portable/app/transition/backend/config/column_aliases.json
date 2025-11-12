@@ -1,0 +1,52 @@
+﻿{
+  "bank_name": [
+    "bank name",
+    "bank",
+    "اسم البنك",
+    "supplier bank",
+    "issuing bank",
+    "bank_name"
+  ],
+  "guarantee_number": [
+    "bank guarantee number",
+    "guarantee number",
+    "lg number",
+    "رقم الضمان",
+    "guarantee_no",
+    "bg number"
+  ],
+  "contract_number": [
+    "contract no.",
+    "contract number",
+    "رقم العقد",
+    "purchase order",
+    "order number",
+    "po number",
+    "reference no",
+    "project number"
+  ],
+  "amount": [
+    "amount",
+    "guarantee amount",
+    "value",
+    "مبلغ الضمان",
+    "amount (sar)",
+    "lg amount"
+  ],
+  "validity_date": [
+    "validity date",
+    "expiry date",
+    "expiry",
+    "تاريخ الانتهاء",
+    "تاريخ الصلاحية",
+    "expiration date"
+  ],
+  "company_name": [
+    "contractor name",
+    "supplier name",
+    "company name",
+    "اسم الشركة",
+    "المورد",
+    "beneficiary"
+  ]
+}

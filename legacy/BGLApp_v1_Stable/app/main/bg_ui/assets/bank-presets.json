@@ -1,0 +1,82 @@
+{
+  "alahli": {
+    "label": "مركز خدمات التجارة - البنك الأهلي السعودي",
+    "name": "البنك الأهلي السعودي",
+    "center": "مركز خدمات التجارة",
+    "address": "ص.ب. 3555 جده 21481",
+    "email": "tradej-lg@alahli.com",
+    "aliases": ["snb", "saudi national bank", "national commercial bank", "alahli", "al ahly", "البنك الاهلي"]
+  },
+  "sabb": {
+    "label": "مركز الخدمات المصرفية - البنك السعودي البريطاني",
+    "name": "البنك السعودي البريطاني",
+    "center": "مركز الخدمات المصرفية",
+    "address": "ص.ب. 9088 الرياض 11413",
+    "email": "sabb.services@sabb.com",
+    "aliases": ["sabb", "alawwal bank", "السعودي البريطاني", "البنك السعودي البريطاني"]
+  },
+  "anb": {
+    "label": "مركز التعاملات البنكية - البنك العربي الوطني",
+    "name": "البنك العربي الوطني",
+    "center": "مركز التعاملات البنكية",
+    "address": "ص.ب. 56921 الرياض 11564",
+    "email": "anb.services@anb.com.sa",
+    "aliases": ["anb", "arab national bank", "البنك العربي الوطني"]
+  },
+  "alrajhi": {
+    "label": "مركز الخدمات المصرفية - مصرف الراجحي",
+    "name": "مصرف الراجحي",
+    "center": "مركز الخدمات المصرفية",
+    "address": "ص.ب. 28 الرياض 11411",
+    "email": "alrajhi.services@alrajhibank.com.sa",
+    "aliases": ["alrajhi", "al rajhi", "مصرف الراجحي", "بنك الراجحي"]
+  },
+  "samba": {
+    "label": "مركز الخدمات المالية - البنك السعودي للاستثمار",
+    "name": "البنك السعودي للاستثمار",
+    "center": "مركز الخدمات المالية",
+    "address": "ص.ب. 3533 الرياض 11481",
+    "email": "samba.services@samba.com",
+    "aliases": ["saudi investment bank", "البنك السعودي للاستثمار", "sib"]
+  },
+  "riyad": {
+    "label": "مركز المعاملات البنكية - بنك الرياض",
+    "name": "بنك الرياض",
+    "center": "مركز المعاملات البنكية",
+    "address": "ص.ب. 22622 الرياض 11416",
+    "email": "riyad.services@riyadbank.com",
+    "aliases": ["riyad bank", "riyadh bank", "بنك الرياض"]
+  },
+  "alfransi": {
+    "label": "مركز الخدمات المصرفية - البنك السعودي الفرنسي",
+    "name": "البنك السعودي الفرنسي",
+    "center": "مركز الخدمات المصرفية",
+    "address": "ص.ب. 56006 الرياض 11554",
+    "email": "alfransi.services@alfransi.com.sa",
+    "aliases": ["banque saudi fransi", "bsf", "البنك السعودي الفرنسي"]
+  },
+  "alawwal": {
+    "label": "مركز المعاملات - البنك الأول",
+    "name": "البنك الأول",
+    "center": "مركز المعاملات",
+    "address": "ص.ب. 3555 الرياض 11481",
+    "email": "alawwal.services@alawwal.com",
+    "aliases": ["alawwal", "alawwal bank", "البنك الاول"]
+  },
+  "inma": {
+    "label": "مركز الخدمات - بنك الإنماء",
+    "name": "بنك الإنماء",
+    "center": "مركز الخدمات",
+    "address": "ص.ب. 2829 الرياض 11461",
+    "email": "inma.services@inmabank.com",
+    "aliases": ["alinma", "al inma", "بنك الانماء"]
+  },
+  "aljazira": {
+    "label": "مركز التعاملات - بنك الجزيرة",
+    "name": "بنك الجزيرة",
+    "center": "مركز التعاملات",
+    "address": "ص.ب. 6277 جدة 21442",
+    "email": "aljazira.services@aljazira.com",
+    "aliases": ["bank aljazira", "bank al jazira", "بنك الجزيرة"]
+  }
+}

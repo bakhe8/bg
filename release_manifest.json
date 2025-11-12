@@ -1,0 +1,9 @@
+{
+  "name": "BGLApp Portable",
+  "version": "1.0.0",
+  "build_date": "2025-11-12",
+  "python_runtime": "3.11.8 embedded",
+  "launcher_version": "v1.0",
+  "core_version": "BGLApp Core v1.2",
+  "notes": "First stable portable build (self-contained runtime, monitoring, review console)"
+}

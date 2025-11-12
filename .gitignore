@@ -8,3 +8,17 @@ main/data/logs/*
 main/data/review/*
 !main/data/review/.gitkeep
 transition/backend/reports/*.log
+BGLApp_Portable/app/portable_runtime/*
+!BGLApp_Portable/app/portable_runtime/.gitkeep
+BGLApp_Portable/app/main/
+BGLApp_Portable/app/data/*
+!BGLApp_Portable/app/data/.gitkeep
+BGLApp_Portable/build/
+BGLApp_Portable/dist/
+BGLApp_Portable/*.spec
+BGLApp_Refactor/runtime/
+test_portable_out.log
+test_portable_err.log
+BGLApp_Portable/gtk_runtime_path.txt
+test_portable_out.log
+test_portable_err.log

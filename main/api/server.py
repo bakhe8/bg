@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 import secrets
 import shutil
 import tempfile
@@ -9,10 +10,9 @@ from typing import List
 
 import uvicorn
 from fastapi import Depends, FastAPI, File, Form, HTTPException, UploadFile
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import FileResponse, JSONResponse, Response
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from fastapi.staticfiles import StaticFiles
-
 from main.api.alerts import notify_failure
 from main.api.api_gateway import ApiGateway
 from main.api.logging_utils import log_event, sanitize_filename, count_records, new_uuid_name
@@ -24,24 +24,67 @@ from main.api.models import (
     IgnoreColumnRequest,
     LetterPayload,
 )
-from main.api.review_store import (
+from BGLApp_Refactor.core.review import (
     ignore_column,
     list_ignored_columns,
     load_unknown_columns,
     record_unknown_columns,
     unignore_column,
 )
+from transition.backend.reference_loader import load_column_aliases
 from main.config import (
     ARCHIVES_DIR,
     ASSETS_DIR,
     COLUMN_ALIASES_PATH,
     EXPORTS_DIR,
     LOGS_DIR,
+    ROOT_DIR,
     REVIEW_DIR,
     TEMPLATES_DIR,
     WEB_DIR,
     settings,
 )
+from BGLApp_Refactor.core.pdf import generator as pdf_generator
+
+if os.name == "nt":
+    _GTK_DLL_HANDLE = None
+
+    def _apply_gtk_runtime_hint() -> None:
+        hint_candidates = [
+            ROOT_DIR.parent / "gtk_runtime_path.txt",
+            Path(os.environ.get("GTK_RUNTIME_HINT", "")) if os.environ.get("GTK_RUNTIME_HINT") else None,
+        ]
+        for candidate in hint_candidates:
+            if not candidate:
+                continue
+            if candidate.is_file():
+                try:
+                    raw_value = candidate.read_text(encoding="utf-8").strip()
+                except OSError:
+                    continue
+                if not raw_value:
+                    continue
+                install_root = Path(raw_value)
+                if not install_root.is_absolute():
+                    install_root = (candidate.parent / install_root).resolve()
+            else:
+                install_root = candidate
+                if not install_root.is_absolute():
+                    install_root = (ROOT_DIR.parent / install_root).resolve()
+            bin_dir = install_root / "bin"
+            if bin_dir.exists():
+                try:
+                    global _GTK_DLL_HANDLE  # noqa: PLW0603
+                    _GTK_DLL_HANDLE = os.add_dll_directory(str(bin_dir))  # type: ignore[attr-defined]
+                except (AttributeError, FileNotFoundError):  # pragma: no cover - older Python
+                    pass
+                os.environ["PATH"] = os.pathsep.join([str(bin_dir), os.environ.get("PATH", "")])
+                os.environ.setdefault("GTK_BASEPATH", str(install_root))
+                break
+
+    _apply_gtk_runtime_hint()
+
+from weasyprint import HTML
 
 READABLE_LOGS = {
     "convert": LOGS_DIR / "convert.log",
@@ -163,6 +206,19 @@ async def save_letter(payload: LetterPayload):
         log_file="letters.log",
     )
     return {"status": "saved", "path": str(target), "filename": filename}
+
+
+@app.post("/api/pdf")
+async def generate_pdf(payload: LetterPayload):
+    data = payload.data or {}
+    try:
+        pdf_bytes = pdf_generator.generate_pdf(data)
+    except Exception as exc:  # pylint:disable=broad-except
+        notify_failure("generate_pdf_error", {"error": str(exc)})
+        raise HTTPException(status_code=500, detail="تعذر توليد ملف PDF") from exc
+    filename = sanitize_filename(payload.filename or new_uuid_name("letter", ".pdf"), "letter.pdf")
+    headers = {"Content-Disposition": f'attachment; filename="{filename}"'}
+    return Response(content=pdf_bytes, media_type="application/pdf", headers=headers)
 
 
 @app.get("/api/aliases")
@@ -365,6 +421,10 @@ def require_monitor_auth(credentials: HTTPBasicCredentials | None):
             detail="بيانات الاعتماد غير صحيحة.",
             headers={"WWW-Authenticate": "Basic"},
         )
+
+
+def render_letter_html(data: dict) -> str:
+    return pdf_generator.render_letter_html(data)
 
 
 if __name__ == "__main__":

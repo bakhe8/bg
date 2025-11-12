@@ -8,6 +8,16 @@
 pip install -r requirements.txt
 ```
 
+> 💡 **ملاحظة WeasyPrint:** على أنظمة Windows ستحتاج لتثبيت مكتبات WeasyPrint (Cairo/Pango/GTK) من الموقع الرسمي قبل تشغيل `/api/pdf`.
+>
+> لتسهيل ذلك أضفنا سكربتًا جاهزًا:
+> ```powershell
+> # من جذر المستودع
+> powershell -ExecutionPolicy Bypass -File BGLApp_Portable\setup\install_gtk_runtime.ps1
+> ```
+> سيُثبّت الحزمة في `%LOCALAPPDATA%\GTK3-Runtime` (يمكن تعديل المسار عبر `-InstallPath`) ويقوم
+> بحفظ المسار في `BGLApp_Portable\gtk_runtime_path.txt` حتى يضيفه المشغّل المحمول تلقائيًا إلى PATH.
+
 ## تشغيل الخادم الرسمي (FastAPI + Uvicorn)
 
 ```
@@ -16,6 +26,7 @@ python -m main.app  # يستخدم uvicorn لتشغيل main.api.server:app
 - واجهة الطباعة: <http://localhost:5000>
 - لوحة مراجعة الأعمدة: <http://localhost:5000/review>
 - لوحة المراقبة (عرض السجلات): <http://localhost:5000/monitor> _(اختياريًا محمية بـ Basic Auth)_.
+- توليد PDF من الخادم: زر "تحميل PDF من الخادم" أو عبر <http://localhost:5000/api/pdf>.
 - توثيق Swagger/OpenAPI: <http://localhost:5000/docs> و <http://localhost:5000/redoc>.
 
 ## البنية الحالية
@@ -56,3 +67,39 @@ BGLApp/
 - لتنشيط الصلاحيات والتنبيهات:
   - عيّن `BGLAPP_MONITOR_USER` و `BGLAPP_MONITOR_PASS` لحماية `/monitor`, `/review`, `/api/logs` بـ Basic Auth.
   - عيّن `BGLAPP_ALERT_WEBHOOK` (Slack أو أي Webhook) + `BGLAPP_ALERT_TIMEOUT` (اختياري) لتلقّي تنبيه فوري عند فشل التحويل أو حفظ الخطاب.
+
+## الإصدار المحمول (Portable)
+
+1. يوجد مجلد `BGLApp_Portable/` يحتوي على نسخة مكتفية ذاتيًا من التطبيق.
+2. لتشغيله على أي نظام:
+   - Windows: شغّل `launcher/run_portable.bat`.
+   - Linux/macOS: `bash launcher/run_portable.sh` (مع التأكد من أن Python متوفر أو استخدام runtime المضمن على ويندوز).
+3. لتجهيز النسخة المحمولة مع Python مضمن وتشغيل سكربت البناء:
+   ```bash
+   cd BGLApp_Portable
+   pip install pyinstaller
+   python build_portable.py
+   ```
+   سيُنشئ مجلد `dist/BGLApp_Portable` الجاهز للنقل أو التشغيل من USB.
+4. لتفعيل توليد PDF من الخادم على Windows، ثبّت مكتبات GTK/Pango/Cairo عبر:
+   ```powershell
+   powershell -ExecutionPolicy Bypass -File BGLApp_Portable\setup\install_gtk_runtime.ps1
+   ```
+   (استخدم `-InstallPath` لتغيير المسار أو `-Force` لإعادة التثبيت. سيُضاف المسار آليًا عند تشغيل النسخة المحمولة).
+5. للتحديث التلقائي:
+   ```bash
+   set BGLAPP_AUTO_UPDATE=1
+   set BGLAPP_UPDATE_MANIFEST_URL=https://example.com/release_manifest.json
+   set BGLAPP_UPDATE_PACKAGE_URL=https://example.com/BGLApp_Portable.zip
+   ```
+   أو شغّل `python launcher/update_portable.py` يدويًا للتحقق من وجود تحديثات.
+6. لبناء ملف تنصيب (Windows):
+   - ثبت Inno Setup على جهازك.
+   - نفّذ `iscc setup/BGLApp.iss` من داخل `BGLApp_Portable/`.
+   - الناتج سيكون `BGLApp_Portable_Setup.exe` داخل نفس المجلد.
+7. بعد البناء ستجد داخل `dist/BGLApp_Portable/`:
+   - `BGLApp.exe` (نسخة بواجهة أوامر)
+   - `BGLApp_Silent.exe` (نسخة صامتة بدون كونسول)
+   - `run_portable.bat` و `run_portable_nowindow.py`
+   - ملف `autorun.inf` وأيقونة جاهزة للتشغيل من USB
+8. ملف `release_manifest.json` في جذر المستودع مثال جاهز يمكن رفعه كما هو (مع تحديث رقم الإصدار والرابط) ليعمل مع نظام التحديث التلقائي.

@@ -1,0 +1,26 @@
+{
+  "name": "BGLApp v2",
+  "version": "2.0.0",
+  "build_date": "2025-11-12",
+  "status": "Pilot Release",
+  "features": [
+    "Modular Core",
+    "Unified API & Web UI",
+    "Enhanced Logging",
+    "Full Portable Environment"
+  ],
+  "next_releases": [
+    {
+      "version": "2.1",
+      "focus": "Server-side WeasyPrint engine"
+    },
+    {
+      "version": "2.2",
+      "focus": "Drag & drop file management UI"
+    },
+    {
+      "version": "3.0",
+      "focus": "Smart Review Dashboard"
+    }
+  ]
+}

@@ -1,15 +1,8 @@
-﻿"""Route registration helpers for the production API."""
+"""
+Legacy Flask routes module.
 
-from flask import Flask
+The API now lives on FastAPI (see ``BGLApp_Refactor.api.routes``). This package
+is kept only so old imports do not break; it no longer registers any blueprints.
+"""
 
-from .convert_excel import bp as convert_blueprint
-from .save_letter import bp as save_letter_blueprint
-from .aliases import bp as aliases_blueprint
-from .review_routes import bp as review_blueprint
-
-
-def register_routes(app: Flask) -> None:
-    app.register_blueprint(convert_blueprint)
-    app.register_blueprint(save_letter_blueprint)
-    app.register_blueprint(aliases_blueprint)
-    app.register_blueprint(review_blueprint)
+__all__: list[str] = []

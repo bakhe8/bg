@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>لوحة مراجعة الأعمدة</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      margin: 0;
+      background: #f7fafc;
+      color: #0f172a;
+    }
+    header {
+      background: #0b6fa4;
+      color: #fff;
+      padding: 20px;
+      text-align: center;
+    }
+    main {
+      max-width: 1100px;
+      margin: 24px auto;
+      padding: 0 16px 48px;
+    }
+    .card {
+      background: #fff;
+      border-radius: 14px;
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+      padding: 20px;
+      margin-bottom: 24px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    th, td {
+      text-align: right;
+      padding: 10px;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    th {
+      background: #f1f5f9;
+      font-size: 0.9rem;
+    }
+    tbody tr:hover {
+      background: #f8fafc;
+    }
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+    select {
+      padding: 6px 10px;
+      border-radius: 8px;
+      border: 1px solid #cbd5f5;
+      font-size: 0.9rem;
+      font-family: inherit;
+    }
+    button {
+      border: none;
+      border-radius: 8px;
+      padding: 8px 12px;
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+    .btn-primary {
+      background: #0b6fa4;
+      color: #fff;
+    }
+    .btn-secondary {
+      background: #e2e8f0;
+      color: #0f172a;
+    }
+    .muted {
+      color: #64748b;
+      font-size: 0.85rem;
+    }
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .tag {
+      background: #e0f2fe;
+      color: #0c4a6e;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+    }
+    @media (max-width: 768px) {
+      table, thead, tbody, th, td, tr { display: block; }
+      th { position: absolute; left: -9999px; top: -9999px; }
+      td { border-bottom: 1px solid #e5e7eb; position: relative; padding-right: 50%; }
+      td::before {
+        position: absolute;
+        right: 10px;
+        white-space: nowrap;
+        color: #475569;
+      }
+      td[data-label]::before {
+        content: attr(data-label);
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>لوحة مراجعة الأعمدة</h1>
+    <p>تابع الأعمدة غير المعروفة واضفها للمراجع الرسمية بنقرة واحدة.</p>
+  </header>
+  <main>
+    <section class="card">
+      <div id="reviewStatus" class="muted">جارٍ تحميل البيانات...</div>
+    </section>
+    <section class="card">
+      <table>
+        <thead>
+          <tr>
+            <th>اسم العمود</th>
+            <th>عدد التكرارات</th>
+            <th>الأوراق</th>
+            <th>الملفات</th>
+            <th>الإجراء</th>
+          </tr>
+        </thead>
+        <tbody id="reviewTableBody">
+        </tbody>
+      </table>
+    </section>
+  </main>
+  <script src="assets/review.js" type="module"></script>
+</body>
+</html>

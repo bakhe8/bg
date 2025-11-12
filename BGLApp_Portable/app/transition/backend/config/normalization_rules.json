@@ -1,0 +1,22 @@
+{
+  "required_fields": [
+    "bank_name",
+    "guarantee_number",
+    "contract_number",
+    "amount",
+    "validity_date",
+    "company_name"
+  ],
+  "text_fields": [
+    "bank_name",
+    "guarantee_number",
+    "contract_number",
+    "company_name"
+  ],
+  "numeric_fields": [
+    "amount"
+  ],
+  "date_fields": [
+    "validity_date"
+  ]
+}
