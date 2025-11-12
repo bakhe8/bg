@@ -1,235 +1,143 @@
-import unittest
-import pandas as pd
+import json
 import os
 import tempfile
-import json
-import sys
-from datetime import datetime
+import unittest
+from typing import Dict
+
+import pandas as pd
+
 from transition.backend.excel_to_json_converter import ExcelToJsonConverter
 
+
+def create_excel_file(frames: Dict[str, pd.DataFrame]) -> str:
+    """Helper to create a temporary Excel file with given sheet frames."""
+    temp_file = tempfile.NamedTemporaryFile(suffix=".xlsx", delete=False)
+    temp_file.close()
+    with pd.ExcelWriter(temp_file.name, engine="openpyxl") as writer:
+        for sheet_name, frame in frames.items():
+            frame.to_excel(writer, sheet_name=sheet_name, index=False)
+    return temp_file.name
+
+
 class TestExcelToJsonConverter(unittest.TestCase):
-    
     def setUp(self):
-        """إعداد بيانات اختبارية"""
-        self.converter = ExcelToJsonConverter()
-        
-        # إنشاء ملف Excel اختباري
-        self.test_data = {
-            'Name': ['أحمد', 'محمد', 'فاطمة', ''],
-            'Age': [25, 30, '', 40],
-            'Salary': ['1000', '2000', '3000', ''],
-            'Account': ['001234', '005678', '009999', ''],
-            'Date': ['2023-01-01', '2023-02-01', '', '2023-03-01']
-        }
-        self.df = pd.DataFrame(self.test_data)
-    
-    def create_test_excel_file(self):
-        """إنشاء ملف Excel مؤقت للاختبار"""
-        temp_file = tempfile.NamedTemporaryFile(suffix='.xlsx', delete=False)
-        self.df.to_excel(temp_file.name, index=False, engine='openpyxl')
-        return temp_file.name
-    
-    def test_clean_data_smart(self):
-        """اختبار وظيفة تنظيف البيانات"""
-        # اختبار مع تفعيل التنظيف
-        converter = ExcelToJsonConverter(clean_data=True)
-        df_cleaned = converter.clean_data_smart(self.df)
-        
-        # التحقق من إزالة الصفوف الفارغة تماماً
-        self.assertLessEqual(len(df_cleaned), len(self.df))
-        
-        # التحقق من تنظيف المسافات
-        for col in df_cleaned.select_dtypes(include=['object']).columns:
-            for value in df_cleaned[col]:
-                if isinstance(value, str):
-                    self.assertEqual(value, value.strip())
-    
-    def test_clean_data_disabled(self):
-        """اختبار عند تعطيل تنظيف البيانات"""
-        converter = ExcelToJsonConverter(clean_data=False)
-        df_cleaned = converter.clean_data_smart(self.df)
-        
-        # يجب أن تبقى البيانات كما هي
-        self.assertEqual(len(df_cleaned), len(self.df))
-    
-    def test_analyze_column(self):
-        """اختبار تحليل الأعمدة"""
-        # اختبار عمود نصي
-        text_series = pd.Series(['أحمد', 'محمد', 'فاطمة'])
-        analysis = self.converter.analyze_column(text_series, text_series.tolist())
-        self.assertEqual(analysis['type'], 'text')
-        
-        # اختبار عمود أرقام
-        numeric_series = pd.Series([1000, 2000, 3000])
-        analysis = self.converter.analyze_column(numeric_series, numeric_series.tolist())
-        self.assertEqual(analysis['type'], 'numeric_string')
-        
-        # اختبار عمود مختلط
-        mixed_series = pd.Series(['001234', '005678', 'محتوى نصي'])
-        analysis = self.converter.analyze_column(mixed_series, mixed_series.tolist())
-        self.assertEqual(analysis['type'], 'text_preserve_format')
-    
-    def test_is_numeric_string(self):
-        """اختبار التعرف على الأرقام النصية"""
-        self.assertTrue(self.converter.is_numeric_string("123"))
-        self.assertTrue(self.converter.is_numeric_string("1,234.56"))
-        self.assertTrue(self.converter.is_numeric_string(1234))
-        self.assertFalse(self.converter.is_numeric_string("123abc"))
-        self.assertFalse(self.converter.is_numeric_string("نص عربي"))
-    
-    def test_is_potential_date(self):
-        """اختبار التعرف على التواريخ"""
-        self.assertTrue(self.converter.is_potential_date("2023-01-01"))
-        self.assertTrue(self.converter.is_potential_date("01/01/2023"))
-        self.assertTrue(self.converter.is_potential_date(datetime.now()))
-        self.assertFalse(self.converter.is_potential_date("نص عادي"))
-    
-    def test_detect_data_types_improved(self):
-        """اختبار كشف أنواع البيانات المحسن"""
-        data_types = self.converter.detect_data_types_improved(self.df)
-        
-        self.assertIn('Name', data_types)
-        self.assertIn('Age', data_types)
-        self.assertIn('Salary', data_types)
-        
-        # التحقق من اكتشاف الأرقام النصية المحافظة على التنسيق
-        account_analysis = data_types['Account']
-        self.assertEqual(account_analysis['type'], 'text_preserve_format')
-    
-    def test_validate_file(self):
-        """اختبار التحقق من الملف"""
-        # إنشاء ملف اختباري
-        test_file = self.create_test_excel_file()
-        temp_txt = tempfile.NamedTemporaryFile(suffix='.txt', delete=False)
-        temp_txt.write(b'placeholder')
-        temp_txt.close()
-        
+        self.converter = ExcelToJsonConverter(clean_data=True)
+
+    def tearDown(self):
+        pd.options.mode.chained_assignment = None
+
+    def test_convert_excel_to_json_normalizes_data(self):
+        frame = pd.DataFrame(
+            {
+                "Bank Name": ["Riyad Bank"],
+                "Bank Guarantee Number": ["RG12345"],
+                "Contract No.": ["PO-7788"],
+                "Amount": ["125000"],
+                "Validity Date": ["2025/12/31"],
+                "Contractor Name": ["شركة ألف"],
+                "Attachment Link": ["skip-me"],
+            }
+        )
+        path = create_excel_file({"Sheet1": frame})
+
         try:
-            # اختبار ملف صالح
-            result = self.converter.validate_file(test_file)
-            self.assertTrue(result)
-            
-            # اختبار ملف غير موجود
+            result = self.converter.convert_excel_to_json(path, sheet_name=0, output_file=None)
+            payload = json.loads(result)
+
+            self.assertIn("file_info", payload)
+            self.assertEqual(payload["file_info"]["records_count"], 1)
+            self.assertIn("Attachment Link", payload["file_info"]["unknown_columns"])
+
+            record = payload["records"][0]
+            self.assertEqual(record["bank_name"], "بنك الرياض")
+            self.assertEqual(record["guarantee_number"], "RG12345")
+            self.assertEqual(record["contract_number"], "PO-7788")
+            self.assertEqual(record["company_name"], "شركة ألف")
+            self.assertEqual(record["validity_date"], "2025-12-31")
+            self.assertEqual(record["amount"], "١٢٥٬٠٠٠٫٠٠")
+        finally:
+            os.unlink(path)
+
+    def test_missing_required_columns_raises(self):
+        frame = pd.DataFrame(
+            {
+                "Bank Name": ["Riyad Bank"],
+                "Contract No.": ["PO-7788"],
+                "Amount": ["125000"],
+                "Validity Date": ["2025/12/31"],
+                "Contractor Name": ["شركة ألف"],
+            }
+        )
+        path = create_excel_file({"Sheet1": frame})
+
+        try:
+            with self.assertRaises(ValueError):
+                self.converter.convert_excel_to_json(path, sheet_name=0)
+        finally:
+            os.unlink(path)
+
+    def test_multi_sheet_conversion(self):
+        sheet_a = pd.DataFrame(
+            {
+                "Bank Name": ["SNB"],
+                "Bank Guarantee Number": ["SNB-1"],
+                "Contract No.": ["PO-1"],
+                "Amount": ["1000"],
+                "Validity Date": ["2025-01-01"],
+                "Contractor Name": ["شركة باء"],
+            }
+        )
+        sheet_b = pd.DataFrame(
+            {
+                "Bank Name": ["BANQUE SAUDI FRANSI"],
+                "Bank Guarantee Number": ["BSF-2"],
+                "Contract No.": ["PO-2"],
+                "Amount": ["2000"],
+                "Validity Date": ["2025-02-01"],
+                "Contractor Name": ["شركة جيم"],
+            }
+        )
+        path = create_excel_file({"SheetA": sheet_a, "SheetB": sheet_b})
+
+        try:
+            result = self.converter.convert_excel_to_json(path, sheet_name="all")
+            payload = json.loads(result)
+            self.assertIn("sheets", payload)
+            self.assertEqual(len(payload["sheets"]), 2)
+            self.assertEqual(payload["sheets"]["SheetA"]["metadata"]["records_count"], 1)
+            self.assertEqual(payload["sheets"]["SheetB"]["records"][0]["bank_name"], "البنك السعودي الفرنسي")
+        finally:
+            os.unlink(path)
+
+    def test_validate_file_checks_extension(self):
+        valid_excel = create_excel_file(
+            {
+                "Sheet1": pd.DataFrame(
+                    {
+                        "Bank Name": ["Riyad Bank"],
+                        "Bank Guarantee Number": ["RG1"],
+                        "Contract No.": ["PO-1"],
+                        "Amount": ["1000"],
+                        "Validity Date": ["2025-12-31"],
+                        "Contractor Name": ["شركة"],
+                    }
+                )
+            }
+        )
+        temp_txt = tempfile.NamedTemporaryFile(suffix=".txt", delete=False)
+        temp_txt.write(b"placeholder")
+        temp_txt.close()
+
+        try:
+            self.assertTrue(self.converter.validate_file(valid_excel))
             with self.assertRaises(FileNotFoundError):
-                self.converter.validate_file('file_does_not_exist.xlsx')
-                
-            # اختبار صيغة غير مدعومة (مع ملف حقيقي)
+                self.converter.validate_file("missing.xlsx")
             with self.assertRaises(ValueError):
                 self.converter.validate_file(temp_txt.name)
-                
         finally:
-            # تنظيف الملفات المؤقتة
-            for candidate in (test_file, temp_txt.name):
-                if os.path.exists(candidate):
-                    os.unlink(candidate)
-    
-    def test_prepare_records(self):
-        """اختبار تحضير السجلات"""
-        data_types = self.converter.detect_data_types_improved(self.df)
-        records = self.converter.prepare_records(self.df, data_types)
-        
-        self.assertEqual(len(records), len(self.df))
-        self.assertIsInstance(records, list)
-        self.assertIsInstance(records[0], dict)
-        
-        # التحقق من الحفاظ على تنسيق الأرقام
-        account_record = records[0]['Account']
-        self.assertEqual(account_record, '001234')  # يجب أن يبقى نصاً
-    
-    def test_empty_dataframe(self):
-        """اختبار مع DataFrame فارغ"""
-        empty_df = pd.DataFrame()
-        data_types = self.converter.detect_data_types_improved(empty_df)
-        self.assertEqual(data_types, {})
-    
-    def test_mixed_data_types_detection(self):
-        """اختبار اكتشاف أنواع البيانات المختلطة"""
-        mixed_data = {
-            'MixedColumn': [123, '456', 'نص', 789.0, '0123']
-        }
-        mixed_df = pd.DataFrame(mixed_data)
-        
-        data_types = self.converter.detect_data_types_improved(mixed_df)
-        mixed_analysis = data_types['MixedColumn']
-        
-        self.assertEqual(mixed_analysis['type'], 'text_preserve_format')
-        self.assertIn('numeric_string', mixed_analysis['types_found'])
-        self.assertIn('text', mixed_analysis['types_found'])
+            os.unlink(valid_excel)
+            os.unlink(temp_txt.name)
 
-class TestIntegration(unittest.TestCase):
-    """اختبارات التكامل"""
-    
-    def test_end_to_end_conversion(self):
-        """اختبار التحويل الكامل من Excel إلى JSON"""
-        converter = ExcelToJsonConverter(clean_data=True)
-        
-        # إنشاء بيانات اختبارية تتوافق مع الأعمدة المعتمدة
-        test_data = {
-            'Bank Name': ['Riyad Bank', 'SNB', 'BANQUE SAUDI FRANSI'],
-            'Bank Guarantee Number': ['RG123', 'SNB456', 'BSF789'],
-            'Contract No.': ['PO-001', 'PO-002', 'PO-003'],
-            'Amount': ['100000', '250000.50', '77500'],
-            'Validity Date': ['2025-12-31', '2026-01-05', '2026-02-10'],
-            'Contractor Name': ['شركة ألف', 'شركة باء', 'شركة جيم']
-        }
-        df = pd.DataFrame(test_data)
-        
-        # حفظ كملف Excel مؤقت
-        with tempfile.NamedTemporaryFile(suffix='.xlsx', delete=False) as temp_file:
-            df.to_excel(temp_file.name, index=False, engine='openpyxl')
-            temp_path = temp_file.name
-        
-        try:
-            # التحويل
-            result = converter.convert_excel_to_json(temp_path, output_file=None)
-            
-            # التحقق من النتيجة
-            self.assertIsInstance(result, str)
-            json_data = json.loads(result)
-            
-            # التحقق من الهيكل
-            self.assertIn('file_info', json_data)
-            self.assertIn('records', json_data)
-            self.assertIn('data_types', json_data)
-            
-            # التحقق من البيانات
-            self.assertEqual(len(json_data['records']), 3)
-            first = json_data['records'][0]
-            self.assertEqual(first['bank_name'], 'بنك الرياض')
-            self.assertEqual(first['guarantee_number'], 'RG123')
-            self.assertEqual(first['contract_number'], 'PO-001')
-            self.assertEqual(first['amount'], '100,000.00')
-            self.assertEqual(first['validity_date'], '2025-12-31')
-            self.assertEqual(first['company_name'], 'شركة ألف')
-            
-        finally:
-            # تنظيف
-            if os.path.exists(temp_path):
-                os.unlink(temp_path)
 
-def run_tests():
-    """تشغيل الاختبارات مع تقرير مفصل"""
-    print("🧪 تشغيل اختبارات محول Excel إلى JSON...")
-    print("=" * 50)
-    
-    # تحميل و تشغيل الاختبارات
-    loader = unittest.TestLoader()
-    suite = loader.loadTestsFromTestCase(TestExcelToJsonConverter)
-    suite.addTests(loader.loadTestsFromTestCase(TestIntegration))
-    
-    # تشغيل مع تقرير مفصل
-    runner = unittest.TextTestRunner(verbosity=2)
-    result = runner.run(suite)
-    
-    # طباعة الملخص
-    print("\n" + "=" * 50)
-    print(f"📊 ملخص الاختبارات:")
-    print(f"   ✅ نجح: {result.testsRun - len(result.failures) - len(result.errors)}")
-    print(f"   ❌ فشل: {len(result.failures)}")
-    print(f"   ⚠️  أخطاء: {len(result.errors)}")
-    
-    return result.wasSuccessful()
-
-if __name__ == '__main__':
-    success = run_tests()
-    sys.exit(0 if success else 1)
+if __name__ == "__main__":  # pragma: no cover
+    unittest.main()

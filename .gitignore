@@ -3,3 +3,4 @@ __pycache__/
 .venv/
 main/data/archives/*
 !main/data/archives/.gitkeep
+transition/backend/reports/*.log

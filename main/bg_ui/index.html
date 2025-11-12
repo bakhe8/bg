@@ -1039,9 +1039,9 @@
     }
 
     function formatRecordLabel(record) {
-      const contractor = record?.['CONTRACTOR NAME'] ?? 'بدون اسم';
-      const guarantee = record?.['BANK GUARANTEE NUMBER'] ?? '';
-      const bank = record?.['BANK NAME'] ?? '';
+      const contractor = record?.company_name ?? record?.['CONTRACTOR NAME'] ?? 'بدون اسم';
+      const guarantee = record?.guarantee_number ?? record?.['BANK GUARANTEE NUMBER'] ?? '';
+      const bank = record?.bank_name ?? record?.['BANK NAME'] ?? '';
       const sheetLabel = record?.__sheetName ? ` - ${record.__sheetName}` : '';
       return `${contractor} — ${guarantee} (${bank}${sheetLabel})`;
     }
@@ -1080,12 +1080,12 @@
       }
 
       const formatted = {
-        bankName: record['BANK NAME'] ?? appState.bank.name,
-        contractorName: record['CONTRACTOR NAME'] ?? appState.company.name,
-        guaranteeNumber: record['BANK GUARANTEE NUMBER'] ?? appState.guarantee.number,
-        contractNumber: record['CONTRACT NO.'] ?? appState.guarantee.contract,
-        amount: formatAmount(record['AMOUNT']),
-        extensionDate: formatDateToArabic(record['VALIDITY DATE']),
+        bankName: record.bank_name ?? record['BANK NAME'] ?? appState.bank.name,
+        contractorName: record.company_name ?? record['CONTRACTOR NAME'] ?? appState.company.name,
+        guaranteeNumber: record.guarantee_number ?? record['BANK GUARANTEE NUMBER'] ?? appState.guarantee.number,
+        contractNumber: record.contract_number ?? record['CONTRACT NO.'] ?? appState.guarantee.contract,
+        amount: formatAmount(record.amount ?? record['AMOUNT']),
+        extensionDate: formatDateToArabic(record.validity_date ?? record['VALIDITY DATE']),
       };
 
       appState.bank.name = formatted.bankName;
@@ -1096,8 +1096,68 @@
       appState.company.name = formatted.contractorName;
 
       saveState();
+      autoApplyBankPreset(formatted.bankName);
       applyStateToView();
       syncFormWithState();
+    }
+
+    function normalizeBankText(value) {
+      return String(value || '')
+        .toLowerCase()
+        .normalize('NFKD')
+        .replace(/[\u0640]/g, '') // إزالة التطويل
+        .replace(/[^\u0600-\u06FFa-z0-9]/g, '')
+        .trim();
+    }
+
+    function autoApplyBankPreset(bankName) {
+      const match = findPresetByBankName(bankName);
+      if (!match) {
+        if (bankPresetSelect) {
+          bankPresetSelect.value = '';
+        }
+        return;
+      }
+      const { key, preset } = match;
+      appState.bank.name = preset.name ?? appState.bank.name;
+      appState.bank.center = preset.center ?? appState.bank.center;
+      appState.bank.poBox = preset.address ?? appState.bank.poBox;
+      appState.bank.email = preset.email ?? appState.bank.email;
+      if (bankPresetSelect) {
+        bankPresetSelect.value = key;
+      }
+      if (bankPresetStatus) {
+        bankPresetStatus.textContent = `تم تطبيق قالب ${preset.label || preset.name || key} تلقائيًا.`;
+      }
+    }
+
+    function findPresetByBankName(bankName) {
+      if (!bankName || !bankPresets) {
+        return null;
+      }
+      const target = normalizeBankText(bankName);
+      if (!target) {
+        return null;
+      }
+      for (const [key, preset] of Object.entries(bankPresets)) {
+        const candidates = [
+          preset.name,
+          preset.label,
+          key,
+          ...(preset.aliases || [])
+        ]
+          .map(normalizeBankText)
+          .filter(Boolean);
+        const matched = candidates.some((candidate) => (
+          candidate === target ||
+          candidate.includes(target) ||
+          target.includes(candidate)
+        ));
+        if (matched) {
+          return { key, preset };
+        }
+      }
+      return null;
     }
 
     function updateRecordControls() {
@@ -1202,6 +1262,17 @@
       if (downloadAllBtn) {
         downloadAllBtn.disabled = false;
       }
+      selectInitialRecord();
+    }
+
+    function selectInitialRecord() {
+      if (!datasetRecords.length || !datasetSelect) {
+        return;
+      }
+      datasetCurrentIndex = 0;
+      datasetSelect.value = '0';
+      applyDatasetRecord(datasetRecords[0]);
+      updateRecordControls();
     }
 
     function extractRecordsFromPayload(payload) {
@@ -1298,8 +1369,8 @@
         updateRecordControls();
         await waitForNextFrame();
 
-        const guarantee = sanitizeFilename(datasetRecords[i]['BANK GUARANTEE NUMBER']);
-        const contractor = sanitizeFilename(datasetRecords[i]['CONTRACTOR NAME']);
+        const guarantee = sanitizeFilename(datasetRecords[i].guarantee_number ?? datasetRecords[i]['BANK GUARANTEE NUMBER']);
+        const contractor = sanitizeFilename(datasetRecords[i].company_name ?? datasetRecords[i]['CONTRACTOR NAME']);
         const filename = `letter_${String(i + 1).padStart(3, '0')}_${guarantee || contractor || 'record'}.pdf`;
         await exportCurrentLetterPdf(filename);
       }

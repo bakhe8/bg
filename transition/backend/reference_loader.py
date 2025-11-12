@@ -33,3 +33,8 @@ def load_bank_reference() -> List[Dict[str, Any]]:
     for entry in payload:
         entry['aliases'] = [alias.lower().strip() for alias in entry.get('aliases', [])]
     return payload
+
+
+@lru_cache(maxsize=1)
+def load_normalization_rules() -> Dict[str, List[str]]:
+    return _load_json('normalization_rules.json')
