@@ -189,6 +189,57 @@
       font-size: 0.9rem;
     }
 
+    .unknown-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .unknown-row {
+      border: 1px dashed rgba(0, 0, 0, 0.2);
+      border-radius: 10px;
+      padding: 10px;
+      background: #fff;
+    }
+
+    .unknown-row-header {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .unknown-row-header small {
+      color: #6b7280;
+      font-size: 0.78rem;
+    }
+
+    .unknown-actions {
+      margin-top: 10px;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .unknown-actions select {
+      flex: 1;
+      padding: 8px;
+      border-radius: 8px;
+      border: 1px solid rgba(0, 0, 0, 0.2);
+      font-size: 0.85rem;
+      font-family: inherit;
+    }
+
+    .unknown-actions button {
+      border: none;
+      border-radius: 8px;
+      padding: 8px 14px;
+      background: #0b6fa4;
+      color: #fff;
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+
     .record-nav {
       display: flex;
       justify-content: space-between;
@@ -200,6 +251,7 @@
     .upload-actions {
       display: flex;
       justify-content: flex-start;
+      flex-wrap: wrap;
       gap: 10px;
       margin-top: 10px;
     }
@@ -361,6 +413,16 @@
       text-align: left;
     }
 
+    .sheet-highlight {
+      animation: pulseSheet 1.2s ease-in-out;
+    }
+
+    @keyframes pulseSheet {
+      0% { box-shadow: 0 0 0 rgba(11, 111, 164, 0); }
+      50% { box-shadow: 0 0 25px rgba(11, 111, 164, 0.35); }
+      100% { box-shadow: 0 0 0 rgba(11, 111, 164, 0); }
+    }
+
     /* كتلة المستلم */
     .preview-container {
       display: flex;
@@ -482,6 +544,8 @@
     <button type="button" id="toggleEditorBtn" aria-controls="dataPanel">تحرير البيانات</button>
     <button type="button" id="downloadAllBtn" class="secondary-btn" disabled>استخراج كل السجلات</button>
     <button id="downloadBtn" aria-controls="letterSheetCanvas">استخراج PDF</button>
+    <button type="button" id="saveLetterBtn" class="secondary-btn" disabled>حفظ الخطاب</button>
+    <button type="button" class="secondary-btn" onclick="window.open('/review','_blank')">لوحة المراجعة</button>
   </div>
 
   <aside class="data-panel" id="dataPanel" aria-hidden="true">
@@ -505,10 +569,12 @@
           <button type="button" id="nextRecordBtn" class="secondary small" disabled>التالي ▶</button>
         </div>
         <div class="upload-actions">
-          <button type="button" id="excelUploadBtn" class="secondary small">تحميل بيانات البنك من Excel</button>
-          <input type="file" id="excelFileInput" accept=".xlsx,.xls" hidden />
+          <button type="button" id="excelUploadBtn" class="secondary small">تحميل ملف Excel</button>
+          <button type="button" id="batchUploadBtn" class="secondary small">تحميل عدة ملفات</button>
+          <input type="file" id="excelFileInput" accept=".xlsx,.xls" hidden multiple />
         </div>
         <p id="excelUploadStatus" class="dataset-status muted"></p>
+        <p id="letterSaveStatus" class="dataset-status muted"></p>
       </div>
 
       <div class="panel-group">
@@ -520,6 +586,12 @@
           </select>
         </label>
         <p id="bankPresetStatus" class="dataset-status muted">سيتم تعبئة بيانات البنك تلقائيًا عند اختيار قالب.</p>
+      </div>
+
+      <div class="panel-group">
+        <h3>الأعمدة غير المعروفة</h3>
+        <p id="unknownColumnsStatus" class="dataset-status muted">لم يتم تحميل أي أعمدة بعد.</p>
+        <div id="unknownColumnsList" class="unknown-list"></div>
       </div>
 
       <div class="panel-group">
@@ -694,8 +766,25 @@
     const letterSheet = document.getElementById('letterSheetCanvas');
     const btn = document.getElementById('downloadBtn');
     const downloadAllBtn = document.getElementById('downloadAllBtn');
+    const saveLetterBtn = document.getElementById('saveLetterBtn');
     const DATASET_URL = 'assets/guarantees_nov_2025.json';
     const BANK_PRESETS_URL = 'assets/bank-presets.json';
+    const unknownColumnsList = document.getElementById('unknownColumnsList');
+    const unknownColumnsStatus = document.getElementById('unknownColumnsStatus');
+    const CANONICAL_FIELDS = [
+      { key: 'bank_name', label: 'اسم البنك' },
+      { key: 'guarantee_number', label: 'رقم الضمان' },
+      { key: 'contract_number', label: 'رقم العقد' },
+      { key: 'amount', label: 'مبلغ الضمان' },
+      { key: 'validity_date', label: 'تاريخ الانتهاء' },
+      { key: 'company_name', label: 'اسم الشركة' }
+    ];
+    let unknownColumns = [];
+    const sessionIgnoredColumns = new Set();
+    let datasetRecords = [];
+    let datasetCurrentIndex = -1;
+    let bankPresets = {};
+    let aliasReference = {};
 
     // تحديث نص الزر وحالته لعرض التغذية البصرية للمستخدم
     function setButtonState(message, disabled = false) {
@@ -712,10 +801,12 @@
       }
 
       setButtonState('تحميل PDF');
+      refreshDownloadButtonIdleLabel();
       return true;
     }
 
     evaluateReadyState();
+    saveLetterBtn?.addEventListener('click', saveLetterToServer);
 
     downloadAllBtn?.addEventListener('click', async () => {
       if (!datasetRecords.length) {
@@ -746,14 +837,23 @@
       if (!evaluateReadyState()) {
         return;
       }
-
+      const { record, index } = getActiveRecordInfo();
+      const filename = buildFilenameForRecord(record, index);
       setButtonState('جاري التحويل...', true);
       try {
-        await exportCurrentLetterPdf('letter.pdf');
-        setButtonState('تحميل PDF');
+        await exportCurrentLetterPdf(filename);
+        setButtonState(`تم إنشاء ${filename}`);
+        setTimeout(() => {
+          setButtonState('تحميل PDF');
+          refreshDownloadButtonIdleLabel();
+        }, 1200);
       } catch (error) {
         console.error(error);
-        setButtonState('حدث خطأ، أعد المحاولة', false);
+        setButtonState('حدث خطأ، أعد المحاولة');
+        setTimeout(() => {
+          setButtonState('تحميل PDF');
+          refreshDownloadButtonIdleLabel();
+        }, 1500);
       }
     });
 
@@ -798,8 +898,10 @@
     const nextRecordBtn = document.getElementById('nextRecordBtn');
     const recordCounter = document.getElementById('recordCounter');
     const excelUploadBtn = document.getElementById('excelUploadBtn');
+    const batchUploadBtn = document.getElementById('batchUploadBtn');
     const excelFileInput = document.getElementById('excelFileInput');
     const excelUploadStatus = document.getElementById('excelUploadStatus');
+    const letterSaveStatus = document.getElementById('letterSaveStatus');
     const bankPresetSelect = document.getElementById('bankPresetSelect');
     const bankPresetStatus = document.getElementById('bankPresetStatus');
 
@@ -816,16 +918,17 @@
     };
 
     let appState = loadState();
-    let datasetRecords = [];
-    let datasetCurrentIndex = -1;
-    let bankPresets = {};
     applyStateToView();
     setupDataPanel();
     initializeDatasetPanel();
     loadBankPresets();
+    loadAliasReference();
     if (downloadAllBtn) {
       downloadAllBtn.disabled = true;
     }
+    refreshDownloadButtonIdleLabel();
+    renderUnknownColumns();
+    setSaveButtonState(true);
 
     function loadState() {
       try {
@@ -971,8 +1074,10 @@
         const records = extractRecordsFromPayload(payload);
         bindDatasetEvents();
         setDatasetRecords(records, 'الملف الافتراضي');
+        setUnknownColumns(extractUnknownColumns(payload));
       } catch (error) {
         setDatasetRecords([], '');
+        setUnknownColumns([]);
         datasetStatus.textContent = 'تعذر تحميل ملف JSON. شغّل الصفحة عبر خادم محلي أو تأكد من المسار.';
         console.error('Dataset load error:', error);
         bindDatasetEvents();
@@ -1011,6 +1116,164 @@
         bankPresetStatus.textContent = 'تعذر تحميل قوالب البنوك.';
         bankPresetSelect.innerHTML = '<option value="">تعذر التحميل</option>';
       }
+    }
+
+    const normalizeAliasValue = (value) => String(value ?? '').toLowerCase().trim();
+
+    async function loadAliasReference() {
+      try {
+        const response = await fetch('/api/aliases', { cache: 'no-store' });
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+        const payload = await response.json();
+        const normalized = {};
+        Object.entries(payload.aliases || {}).forEach(([key, values]) => {
+          normalized[key] = (values || []).map(normalizeAliasValue);
+        });
+        aliasReference = normalized;
+      } catch (error) {
+        console.error('Alias reference load error:', error);
+      }
+    }
+
+    function setUnknownColumns(entries) {
+      unknownColumns = (Array.isArray(entries) ? entries : []).filter(
+        (item) => !sessionIgnoredColumns.has(normalizeAliasValue(item?.label))
+      );
+      renderUnknownColumns();
+    }
+
+    function mergeUnknownLists(lists) {
+      const registry = new Map();
+      lists.flat().forEach((item) => {
+        if (!item || !item.label) {
+          return;
+        }
+        const key = normalizeAliasValue(item.label);
+        if (!registry.has(key)) {
+          registry.set(key, { label: item.label, sheets: new Set(item.sheets || []) });
+        } else {
+          const entry = registry.get(key);
+          (item.sheets || []).forEach((sheet) => entry.sheets.add(sheet));
+        }
+      });
+      return Array.from(registry.values()).map((entry) => ({
+        label: entry.label,
+        sheets: Array.from(entry.sheets),
+      }));
+    }
+
+    function renderUnknownColumns() {
+      if (!unknownColumnsStatus || !unknownColumnsList) {
+        return;
+      }
+      if (!unknownColumns.length) {
+        unknownColumnsStatus.textContent = 'لا توجد أعمدة غير معروفة حالياً.';
+        unknownColumnsList.innerHTML = '';
+        return;
+      }
+      unknownColumnsStatus.textContent = 'حدد الحقل القياسي لكل عمود غير معروف لإضافته للمراجع.';
+      unknownColumnsList.innerHTML = unknownColumns.map((item, index) => {
+        const sheets = item.sheets?.length ? `موجود في: ${item.sheets.join(', ')}` : 'موجود في كل الأوراق';
+        const options = [
+          '<option value="">اختر الحقل القياسي</option>',
+          ...CANONICAL_FIELDS.map((field) => `<option value="${field.key}">${field.label}</option>`)
+        ].join('');
+        return `
+          <div class="unknown-row" data-index="${index}">
+            <div class="unknown-row-header">
+              <strong>${item.label}</strong>
+              <small>${sheets}</small>
+            </div>
+            <div class="unknown-actions">
+              <select data-select-index="${index}">
+                ${options}
+              </select>
+              <button type="button" class="alias-add-btn" data-index="${index}">
+                إضافة للمراجع
+              </button>
+              <button type="button" class="alias-ignore-btn" data-index="${index}">
+                تجاهل هذا العمود
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    unknownColumnsList?.addEventListener('click', (event) => {
+      const addButton = event.target.closest('.alias-add-btn');
+      if (addButton) {
+        const index = Number(addButton.dataset.index);
+        handleAliasAssignment(index, addButton);
+        return;
+      }
+      const ignoreButton = event.target.closest('.alias-ignore-btn');
+      if (ignoreButton) {
+        const index = Number(ignoreButton.dataset.index);
+        handleIgnoreColumn(index);
+      }
+    });
+
+    async function handleAliasAssignment(index, button) {
+      const item = unknownColumns[index];
+      if (!item) {
+        return;
+      }
+      const select = unknownColumnsList.querySelector(`select[data-select-index="${index}"]`);
+      const canonical = select?.value;
+      if (!canonical) {
+        alert('الرجاء اختيار الحقل القياسي المرتبط بهذا العمود.');
+        return;
+      }
+      const normalizedAlias = normalizeAliasValue(item.label);
+      const existingAliases = aliasReference[canonical] || [];
+      if (existingAliases.includes(normalizedAlias)) {
+        const fieldLabel = select.selectedOptions[0]?.textContent || canonical;
+        unknownColumns.splice(index, 1);
+        renderUnknownColumns();
+        unknownColumnsStatus.textContent = `العمود "${item.label}" مرتبط بالفعل بالحقل ${fieldLabel}.`;
+        return;
+      }
+      button.disabled = true;
+      button.textContent = 'جارٍ الإضافة...';
+      try {
+        const response = await fetch('/api/aliases', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            canonical,
+            alias: item.label
+          })
+        });
+        const payload = await response.json();
+        if (!response.ok || payload.error) {
+          throw new Error(payload.error || 'تعذر إضافة العمود للمراجع');
+        }
+        aliasReference[canonical] = [...(aliasReference[canonical] || []), normalizedAlias];
+        const fieldLabel = select.selectedOptions[0]?.textContent || canonical;
+        unknownColumns.splice(index, 1);
+        renderUnknownColumns();
+        unknownColumnsStatus.textContent = `تمت إضافة العمود "${item.label}" إلى ${fieldLabel}.`;
+        loadAliasReference();
+      } catch (error) {
+        console.error('Alias add failed', error);
+        unknownColumnsStatus.textContent = `تعذر إضافة العمود "${item.label}": ${error.message}`;
+        button.disabled = false;
+        button.textContent = 'إضافة للمراجع';
+      }
+    }
+
+    function handleIgnoreColumn(index) {
+      const item = unknownColumns[index];
+      if (!item) {
+        return;
+      }
+      sessionIgnoredColumns.add(normalizeAliasValue(item.label));
+      unknownColumns.splice(index, 1);
+      renderUnknownColumns();
+      unknownColumnsStatus.textContent = `تم تجاهل العمود "${item.label}" لهذه الجلسة.`;
     }
 
     function bindDatasetEvents() {
@@ -1190,16 +1453,37 @@
     }
 
     excelUploadBtn?.addEventListener('click', () => {
-      excelFileInput?.click();
+      triggerExcelPicker('single');
     });
 
-    excelFileInput?.addEventListener('change', async (event) => {
-      const file = event.target.files?.[0];
-      if (!file) {
+    batchUploadBtn?.addEventListener('click', () => {
+      triggerExcelPicker('batch');
+    });
+
+    function triggerExcelPicker(mode) {
+      if (!excelFileInput) {
         return;
       }
-      await uploadExcelFile(file);
-      event.target.value = '';
+      excelFileInput.dataset.mode = mode;
+      excelFileInput.click();
+    }
+
+    excelFileInput?.addEventListener('change', async (event) => {
+      const files = Array.from(event.target.files || []);
+      if (!files.length) {
+        return;
+      }
+      const mode = event.target.dataset.mode || (files.length > 1 ? 'batch' : 'single');
+      try {
+        if (mode === 'batch' || files.length > 1) {
+          await uploadBatchFiles(files);
+        } else {
+          await uploadExcelFile(files[0]);
+        }
+      } finally {
+        event.target.value = '';
+        event.target.dataset.mode = 'single';
+      }
     });
 
     async function uploadExcelFile(file) {
@@ -1221,21 +1505,76 @@
         if (!response.ok || result.error) {
           throw new Error(result.error || 'تعذر تحويل الملف');
         }
-        const records = extractRecordsFromPayload(result);
+        const payload = result.data || result;
+        const records = extractRecordsFromPayload(payload);
         if (!records.length) {
           throw new Error('لم يتم العثور على سجلات في الملف المرفوع');
         }
         setDatasetRecords(records, file.name);
+        setUnknownColumns(extractUnknownColumns(payload));
         excelUploadStatus.textContent = `تم تحميل ${records.length} سجلًا من ${file.name}`;
         datasetStatus.textContent = `تم تحميل ${records.length} سجلًا من ${file.name}`;
       } catch (error) {
         console.error('Excel upload failed', error);
+        excelUploadStatus.textContent = `خطأ: ${error.message}`;
+        setUnknownColumns([]);
+      }
+    }
+
+    async function uploadBatchFiles(files) {
+      if (!excelUploadStatus) {
+        return;
+      }
+      const total = files.length;
+      excelUploadStatus.textContent = `جارٍ معالجة ${total} ملف...`;
+      const formData = new FormData();
+      files.forEach((file) => formData.append('files', file));
+      formData.append('sheet', 'all');
+      formData.append('clean', 'true');
+      formData.append('optimize', 'true');
+      try {
+        const response = await fetch('/api/convert/batch', {
+          method: 'POST',
+          body: formData
+        });
+        const result = await response.json();
+        if (!response.ok || result.error) {
+          throw new Error(result.error || 'تعذر تحويل الملفات');
+        }
+        const { results = [], errors = [] } = result;
+        if (!results.length) {
+          throw new Error('لم يتم تحويل أي ملف بنجاح');
+        }
+        const aggregatedRecords = [];
+        const unknownLists = [];
+        results.forEach((entry) => {
+          const payload = entry.data;
+          aggregatedRecords.push(...extractRecordsFromPayload(payload));
+          unknownLists.push(extractUnknownColumns(payload));
+        });
+        if (!aggregatedRecords.length) {
+          throw new Error('لم يتم استخراج أي سجلات من الملفات المرفوعة');
+        }
+        setDatasetRecords(aggregatedRecords, `${results.length} ملف`);
+        setUnknownColumns(mergeUnknownLists(unknownLists));
+        let status = `تم تحويل ${results.length} ملفًا.`;
+        if (errors.length) {
+          status += ` تعذر تحويل ${errors.length} ملف.`;
+          console.warn('Batch conversion errors:', errors);
+        }
+        excelUploadStatus.textContent = status;
+        if (errors.length) {
+          alert('تم تحويل بعض الملفات فقط. راجع وحدة التحكم للتفاصيل.');
+        }
+      } catch (error) {
+        console.error('Batch Excel upload failed', error);
         excelUploadStatus.textContent = `خطأ: ${error.message}`;
       }
     }
 
     function setDatasetRecords(records, sourceLabel = '') {
       bindDatasetEvents();
+      sessionIgnoredColumns.clear();
       datasetRecords = Array.isArray(records) ? records : [];
       datasetCurrentIndex = -1;
       updateRecordControls();
@@ -1247,6 +1586,8 @@
         if (downloadAllBtn) {
           downloadAllBtn.disabled = true;
         }
+        refreshDownloadButtonIdleLabel();
+        setSaveButtonState(true);
         return;
       }
       datasetSelect.innerHTML = [
@@ -1263,6 +1604,8 @@
         downloadAllBtn.disabled = false;
       }
       selectInitialRecord();
+      announcePrintReady(count, sourceLabel);
+      setSaveButtonState(true);
     }
 
     function selectInitialRecord() {
@@ -1273,6 +1616,168 @@
       datasetSelect.value = '0';
       applyDatasetRecord(datasetRecords[0]);
       updateRecordControls();
+    }
+    function announcePrintReady(count, sourceLabel) {
+      if (!count || !excelUploadStatus) {
+        return;
+      }
+      excelUploadStatus.textContent = `تم تجهيز ${count} سجلًا من ${sourceLabel || 'الملف الحالي'} ويمكنك الآن استخراج PDF.`;
+      focusLetterSheet();
+      refreshDownloadButtonIdleLabel();
+    }
+
+    function focusLetterSheet() {
+      if (!letterSheet) {
+        return;
+      }
+      letterSheet.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      letterSheet.classList.add('sheet-highlight');
+      setTimeout(() => {
+        letterSheet.classList.remove('sheet-highlight');
+      }, 1500);
+    }
+
+    function setSaveButtonState(enabled) {
+      if (saveLetterBtn) {
+        saveLetterBtn.disabled = !enabled;
+      }
+    }
+
+    async function saveLetterToServer() {
+      if (!saveLetterBtn) {
+        return;
+      }
+      const payload = buildLetterPayload();
+      if (!payload) {
+        alert('لا توجد بيانات متاحة لحفظ الخطاب.');
+        return;
+      }
+      const originalLabel = saveLetterBtn.textContent;
+      setSaveButtonState(false);
+      saveLetterBtn.textContent = 'جارٍ الحفظ...';
+      if (letterSaveStatus) {
+        letterSaveStatus.textContent = 'جارٍ حفظ الخطاب...';
+      }
+      try {
+        const response = await fetch('/api/letters', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const result = await response.json();
+        if (!response.ok || result.error) {
+          throw new Error(result.error || 'تعذر حفظ الخطاب');
+        }
+        if (letterSaveStatus) {
+          letterSaveStatus.textContent = `تم حفظ الخطاب باسم ${result.filename || payload.filename || 'letter.json'}`;
+        }
+      } catch (error) {
+        console.error('Save letter failed', error);
+        if (letterSaveStatus) {
+          letterSaveStatus.textContent = `خطأ أثناء الحفظ: ${error.message}`;
+        }
+      } finally {
+        saveLetterBtn.textContent = originalLabel;
+        setSaveButtonState(true);
+      }
+    }
+
+    function buildLetterPayload() {
+      const { record, displayIndex } = getActiveRecordInfo();
+      const canonical = {
+        bank_name: resolveField(record, ['bank_name', 'BANK NAME'], appState.bank.name),
+        guarantee_number: resolveField(record, ['guarantee_number', 'BANK GUARANTEE NUMBER'], appState.guarantee.number),
+        contract_number: resolveField(record, ['contract_number', 'CONTRACT NO.', 'CONTRACT NO', 'CONTRACT NUMBER'], appState.guarantee.contract),
+        amount: String(resolveField(record, ['amount', 'AMOUNT'], appState.guarantee.amount || '') || ''),
+        validity_date: normalizeDateForSave(resolveField(record, ['validity_date', 'VALIDITY DATE'], appState.guarantee.extensionDate || '')),
+        company_name: resolveField(record, ['company_name', 'CONTRACTOR NAME', 'SUPPLIER NAME'], appState.company.name),
+      };
+      const filenameSeed = sanitizeFilename(canonical.guarantee_number || canonical.company_name || `record_${displayIndex || Date.now()}`);
+      return {
+        filename: filenameSeed ? `letter_${filenameSeed}.json` : undefined,
+        data: {
+          ...canonical,
+          bank_center: appState.bank.center,
+          bank_po_box: appState.bank.poBox,
+          bank_email: appState.bank.email,
+          metadata: {
+            saved_at: new Date().toISOString(),
+            record_index: displayIndex,
+            total_records: datasetRecords.length,
+          }
+        }
+      };
+    }
+
+    function resolveField(record, keys, fallback = '') {
+      if (record) {
+        for (const key of keys) {
+          const value = record[key];
+          if (value !== undefined && value !== null && String(value).trim() !== '') {
+            return value;
+          }
+        }
+      }
+      return fallback;
+    }
+
+    function normalizeDateForSave(value) {
+      if (!value) {
+        return '';
+      }
+      const date = new Date(value);
+      if (!Number.isNaN(date.getTime())) {
+        return date.toISOString().slice(0, 10);
+      }
+      return value;
+    }
+
+    function extractUnknownColumns(payload) {
+      if (!payload || typeof payload !== 'object') {
+        return [];
+      }
+      const collector = new Map();
+      const addColumn = (value, sheet) => {
+        if (value === null || value === undefined) {
+          return;
+        }
+        const label = String(value).trim();
+        if (!label) {
+          return;
+        }
+        const key = label.toLowerCase();
+        if (!collector.has(key)) {
+          collector.set(key, { label, sheets: new Set() });
+        }
+        if (sheet) {
+          collector.get(key).sheets.add(sheet);
+        }
+      };
+
+      const info = payload.file_info?.unknown_columns;
+      if (Array.isArray(info)) {
+        info.forEach((col) => addColumn(col, payload.file_info?.sheet_name));
+      } else if (info && typeof info === 'object') {
+        Object.entries(info).forEach(([sheetName, columns]) => {
+          if (Array.isArray(columns)) {
+            columns.forEach((col) => addColumn(col, sheetName));
+          }
+        });
+      }
+
+      if (collector.size === 0 && payload.sheets && typeof payload.sheets === 'object') {
+        Object.entries(payload.sheets).forEach(([sheetName, sheet]) => {
+          const unknownList = sheet?.metadata?.unknown_columns;
+          if (Array.isArray(unknownList)) {
+            unknownList.forEach((col) => addColumn(col, sheetName));
+          }
+        });
+      }
+
+      return Array.from(collector.values()).map((entry) => ({
+        label: entry.label,
+        sheets: Array.from(entry.sheets)
+      }));
     }
 
     function extractRecordsFromPayload(payload) {
@@ -1395,6 +1900,43 @@
         return '';
       }
       return String(value).replace(/[\\/:*?"<>|]/g, '_').trim();
+    }
+
+    function getActiveRecordInfo() {
+      if (datasetCurrentIndex >= 0 && datasetRecords[datasetCurrentIndex]) {
+        return {
+          record: datasetRecords[datasetCurrentIndex],
+          index: datasetCurrentIndex,
+          displayIndex: datasetCurrentIndex + 1
+        };
+      }
+      return { record: null, index: -1, displayIndex: 0 };
+    }
+
+    function getDownloadIdleLabel() {
+      const { record, displayIndex } = getActiveRecordInfo();
+      if (record) {
+        return `تحميل PDF للسجل ${displayIndex}`;
+      }
+      return 'تحميل PDF (بيانات مخصصة)';
+    }
+
+    function refreshDownloadButtonIdleLabel() {
+      if (!btn || btn.disabled) {
+        return;
+      }
+      btn.textContent = getDownloadIdleLabel();
+    }
+
+    function buildFilenameForRecord(record, index = -1) {
+      if (record) {
+        const guarantee = sanitizeFilename(record.guarantee_number ?? record['BANK GUARANTEE NUMBER']);
+        const contractor = sanitizeFilename(record.company_name ?? record['CONTRACTOR NAME']);
+        const prefix = index > -1 ? `letter_${String(index + 1).padStart(3, '0')}` : 'letter_record';
+        return `${prefix}_${guarantee || contractor || 'record'}.pdf`;
+      }
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+      return `letter_custom_${timestamp}.pdf`;
     }
 
     function waitForNextFrame() {

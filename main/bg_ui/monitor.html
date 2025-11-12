@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>لوحة المراقبة - BGLApp</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      background: #f8fafc;
+      margin: 0;
+      color: #0f172a;
+    }
+    header {
+      background: #0b6fa4;
+      color: #fff;
+      padding: 20px;
+      text-align: center;
+    }
+    main {
+      max-width: 1100px;
+      margin: 24px auto;
+      padding: 0 16px 48px;
+    }
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    select, input {
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: 1px solid #cbd5f5;
+      font-size: 0.9rem;
+      font-family: inherit;
+    }
+    button {
+      border: none;
+      border-radius: 8px;
+      padding: 8px 14px;
+      cursor: pointer;
+      background: #0b6fa4;
+      color: #fff;
+      font-size: 0.9rem;
+    }
+    pre {
+      background: #0f172a;
+      color: #e2e8f0;
+      padding: 20px;
+      border-radius: 14px;
+      max-height: 600px;
+      overflow: auto;
+      font-size: 0.85rem;
+    }
+    .status {
+      color: #475569;
+      margin-top: 8px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>لوحة المراقبة</h1>
+    <p>عرض سريع للسجلات وآخر العمليات.</p>
+  </header>
+  <main>
+    <div class="controls">
+      <label>
+        اختر السجل
+        <select id="logSelector">
+          <option value="convert">سجل التحويلات</option>
+          <option value="letters">سجل الحفظ</option>
+          <option value="review">سجل المراجعة</option>
+        </select>
+      </label>
+      <label>
+        عدد الأسطر
+        <input type="number" id="logLimit" min="50" max="1000" value="200">
+      </label>
+      <button id="refreshLogsBtn">تحديث</button>
+    </div>
+    <div id="monitorStatus" class="status">اختر السجل لعرضه.</div>
+    <pre id="logsOutput">--</pre>
+  </main>
+  <script src="assets/monitor.js" type="module"></script>
+</body>
+</html>
