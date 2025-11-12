@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ورقة اختبار خطابات الضمان</title>
+  <style>
+    /* تحميل عائلة الخط بأوزان متعددة للاستخدام داخل المستند */
+    @font-face {
+      font-family: 'AlMohanad-Regular';
+      src: url("assets/AL-Mohanad.ttf") format("truetype");
+      font-weight: 400;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    @font-face {
+      font-family: 'AlMohanad-Bold';
+      src: url("assets/AL-Mohanad Bold.ttf") format("truetype");
+      font-weight: 600;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    @font-face {
+      font-family: 'AlMohanad-ExtraBold';
+      src: url("assets/AL-Mohanad Extra Bold.ttf") format("truetype");
+      font-weight: 700;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    :root {
+      --font-regular: 'AlMohanad-Regular', 'Segoe UI', Tahoma, sans-serif;
+      --font-bold: 'AlMohanad-Bold', 'Segoe UI', Tahoma, sans-serif;
+      --font-extrabold: 'AlMohanad-ExtraBold', 'Segoe UI', Tahoma, sans-serif;
+      --page-width: 210mm;
+      --page-height: 297mm;
+      --subject-accent: rgba(0, 0, 0, 0.08);
+    }
+
+    /* ضبط القيم الافتراضية */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* إعداد الخلفية والهيكل العام للصفحة */
+    body {
+      font-family: var(--font-bold);
+      line-height: 1.8;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: center;
+      background: #f5f5f5;
+      padding: 20px;
+    }
+
+    /* شريط الأدوات */
+    .toolbar {
+      position: fixed;
+      top: 16px;
+      left: 16px;
+      z-index: 10;
+    }
+
+    .toolbar button {
+      padding: 10px 18px;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      cursor: pointer;
+      background: #0b6fa4;
+      color: #fff;
+      box-shadow: 0 8px 18px rgba(11, 111, 164, 0.25);
+      margin: 5px;
+    }
+
+    .toolbar button:hover {
+      opacity: 0.9;
+    }
+
+    /* الورقة */
+    .letter-sheet {
+      width: var(--page-width);
+      height: var(--page-height);
+      margin: 20px auto;
+      padding: 0;
+      border: none;
+      border-radius: 0;
+      box-shadow: 0 0 20px rgba(0,0,0,0.1);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      background: white;
+    }
+
+    /* محتوى الورقة */
+    .sheet-content {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: stretch;
+      padding: 60mm 25mm 0mm 25mm;
+    }
+
+    /* حقل النص الرئيسي للخطاب */
+    .writing-area {
+      width: 100%;
+      flex: 1;
+    }
+
+    /* كل سطر منفصل مع تباعد متساوٍ */
+    .letter-line {
+      margin-bottom: 4mm;
+    }
+
+    .letter-line:last-child {
+      margin-bottom: 0;
+    }
+
+    .letter-paragraph {
+      margin: 0;
+      text-align: justify;
+     }
+
+    /* التذييل */
+    .sheet-footer {
+      margin: -5mm 20mm 20mm 20mm;
+      border: none;
+      background: transparent;
+      outline: none;
+      font-family: var(--font-regular);
+      font-size: 0.6rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8mm;
+    }
+
+    /* إعداد الحقول داخل التذييل */
+    .sheet-footer span {
+      flex: 1;
+      display: inline-block;
+      white-space: pre-wrap;
+    }
+
+    .sheet-footer .footer-left {
+      text-align: right;
+    }
+
+    .sheet-footer .footer-right {
+      text-align: left;
+    }
+
+    /* كتلة المستلم */
+    .preview-container {
+      display: flex;
+      flex-direction: column;
+      gap: 1mm;
+    }
+
+    .preview-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 12mm;
+      align-items: flex-start;
+    }
+
+    .preview-recipient {
+      flex: 1;
+      line-height: 1.6;
+    }
+
+    .preview-salutation {
+      text-align: left;
+    }
+
+    /* الموضوع */
+    .preview-subject {
+      background: var(--subject-accent);
+      display: flex;
+      gap: 8px;
+      padding: 0;
+    }
+
+    .preview-subject-label {
+      white-space: nowrap;
+    }
+
+    .preview-subject-text {
+      flex: 1;
+      text-align: right;
+    }
+
+    /* المحتوى */
+    .preview-content {
+      display: flex;
+      flex-direction: column;
+      gap: 1mm;
+    }
+
+    .preview-greeting {
+      margin: 0;
+    }
+
+    .preview-address-box {
+      margin: 0;
+      padding-right: 30px;
+    }
+
+    /* توقيع */
+    .preview-note {
+      text-align: right;
+      margin-bottom: 10px;
+      padding-right: 100px;
+    }
+
+    .preview-signature {
+      text-align: center;
+      margin-right: 300px;
+    }
+
+    .preview-signature div + .signature-seal {
+      margin-top: 18mm;
+    }
+
+    /* Editor Panel - Visible by default */
+    .editor-panel {
+      position: fixed;
+      top: 80px;
+      left: 20px;
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+      width: 320px;
+      max-height: 75vh;
+      overflow-y: auto;
+      z-index: 100;
+      border: 2px solid #0b6fa4;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 13px;
+      margin-bottom: 5px;
+      font-weight: bold;
+      color: #2c3e50;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 13px;
+      font-family: var(--font-regular);
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: #0b6fa4;
+      box-shadow: 0 0 0 2px rgba(11, 111, 164, 0.1);
+    }
+
+    .update-btn {
+      width: 100%;
+      padding: 10px;
+      background: #0b6fa4;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-family: var(--font-bold);
+      font-size: 14px;
+      margin-top: 10px;
+    }
+
+    .update-btn:hover {
+      background: #095d8a;
+    }
+
+    /* PDF Template (hidden) */
+    .pdf-template {
+      position: absolute;
+      top: -10000px;
+      left: -10000px;
+      width: var(--page-width);
+      height: var(--page-height);
+      background: white;
+      background-image: url("assets/External Form.svg");
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+
+    @media print {
+      @page {
+        size: A4;
+        margin: 0;
+      }
+      body {
+        display: block;
+        margin: 0;
+        padding: 0;
+        min-height: auto;
+        align-items: initial;
+        justify-content: flex-start;
+        background: white;
+      }
+      #actionToolbar, .editor-panel {
+        display: none !important;
+      }
+      .letter-sheet {
+        box-shadow: none;
+        margin: 0;
+      }
+    }
+
+  </style>
+</head>
+<body id="pageRoot">
+  <!-- شريط الأدوات للتحكم بعملية التصدير -->
+  <div class="toolbar" id="actionToolbar">
+    <button id="downloadBtn" aria-controls="letterSheetCanvas">استخراج PDF</button>
+  </div>
+
+  <!-- Editor Panel - Now Visible by Default -->
+  <div class="editor-panel" id="editorPanel">
+    <h3 style="margin: 0 0 15px 0; color: #2c3e50; text-align: center;">✏️ محرر الخطاب</h3>
+    
+    <div class="form-group">
+      <label for="bankName">اسم البنك:</label>
+      <input type="text" id="bankName" class="form-control" value="البنك الأهلي السعودي">
+    </div>
+    <div class="form-group">
+      <label for="bankCenter">المركز:</label>
+      <input type="text" id="bankCenter" class="form-control" value="مركز خدمات التجارة">
+    </div>
+    <div class="form-group">
+      <label for="bankPoBox">صندوق البريد:</label>
+      <input type="text" id="bankPoBox" class="form-control" value="3555 جده 21481">
+    </div>
+    <div class="form-group">
+      <label for="bankEmail">البريد الإلكتروني:</label>
+      <input type="email" id="bankEmail" class="form-control" value="tradej-lg@alahli.com">
+    </div>
+    <div class="form-group">
+      <label for="guaranteeNumber">رقم الضمان:</label>
+      <input type="text" id="guaranteeNumber" class="form-control" value="M113528">
+    </div>
+    <div class="form-group">
+      <label for="contractNumber">رقم العقد:</label>
+      <input type="text" id="contractNumber" class="form-control" value="434153">
+    </div>
+    <div class="form-group">
+      <label for="guaranteeAmount">مبلغ الضمان:</label>
+      <input type="text" id="guaranteeAmount" class="form-control" value="20,000.00">
+    </div>
+    <div class="form-group">
+      <label for="extensionDate">تاريخ الانتهاء:</label>
+      <input type="text" id="extensionDate" class="form-control" value="30 يوليو 2026">
+    </div>
+    <div class="form-group">
+      <label for="companyName">اسم الشركة:</label>
+      <input type="text" id="companyName" class="form-control" value="شركة رؤية القوى للمصاعد">
+    </div>
+    <button class="update-btn" onclick="updatePreview()">
+      🔄 تحديث المعاينة
+    </button>
+  </div>
+
+  <!-- مسرح الورقة بقياس A4 -->
+  <main class="letter-sheet" id="letterSheetCanvas" aria-label="ورقة الخطاب A4">
+    <div class="sheet-content" id="sheetContent">
+      <!-- المنطقة القابلة للتحرير الخاصة بنص الخطاب -->
+      <section class="writing-area" id="letterWritingArea" contenteditable="false" aria-label="منطقة الكتابة الرئيسة">
+        <div style="display:none;" aria-hidden="true">تنبيه داخلي: يرجى عدم تعديل خصائص هذا القسم، والتعديل يكون على العناصر أدناه فقط.</div>
+
+        <!-- قالب الخطاب الأساسي مستخدمًا نفس هيكلة preview لضمان توزيع النص -->
+        <article class="preview-container" id="primaryLetter">
+          <div class="preview-header">
+            <div class="preview-recipient-name" id="bank_name">
+              <div>السـادة / البنك الأهلي السعودي</div>
+            </div>
+            <div class="preview-salutation">
+              <div>المحترمين</div>
+            </div>
+          </div>
+          <div class="preview-recipient" id="bank_details">
+            <div>مركز خدمات التجارة</div>
+            <div>ص.ب. 3555 جده 21481</div>
+            <div>البريد الإلكتروني: tradej-lg@alahli.com</div>
+          </div>
+
+          <div class="preview-greeting">
+            <div>السَّلام عليكُم ورحمَة الله وبركاتِه</div>
+          </div>
+
+          <div class="preview-subject">
+            <div class="preview-subject-label">الموضوع:</div>
+            <div class="preview-subject-text" id="subject_text">طلب تمديد الضمان البنكي رقم (M113528) والعائد للعقد رقم (434153).</div>
+          </div>
+
+          <div class="preview-content">
+            <p class="letter-paragraph" id="content_paragraph1">
+              إشارة إلى الضمان البنكي النهائي الموضح أعلاه، والصادر منكم لصالحنا على حساب شركة رؤية القوى للمصاعد
+              بمبلغ قدره (20,000.00) ريال، نأمل منكم تمديد فترة سريان الضمان حتى تاريخ 30 يوليو 2026م مع بقاء
+              الشروط الأخرى دون تغيير، وإفادتنا بذلك من خلال البريد الإلكتروني المخصص للضمانات البنكية لدى
+              مستشفى الملك فيصل التخصصي ومركز الأبحاث بالرياض (bgfinance@kfshrc.edu.sa)، كما نأمل منكم إرسال أصل
+              تمديد الضمان إلى العنوان التالي:
+            </p>
+
+            <div class="preview-address-box">
+              <div>مستشفى الملك فيصل التخصصي ومركز الأبحاث - الرياض</div>
+              <div>ص.ب 3354 الرياض 11211</div>
+              <div>مكتب الخدمات الإدارية</div>
+            </div>
+
+            <p class="letter-paragraph">
+              علمًا بأنه في حال عدم تمكن البنك من تمديد الضمان المذكور قبل انتهاء مدة سريانه فيجب على البنك دفع
+              قيمة الضمان إلينا حسب النظام.
+            </p>
+          </div>
+
+          <div class="preview-clearfix">
+            <div class="letter-line preview-note">وَتفضَّلوا بِقبُول خَالِص تحيَّاتي</div>
+            <div class="preview-signature">
+              <div>مُدير الإدارة العامَّة للعمليَّات المحاسبيَّة</div>
+              <div class="signature-seal">سَامي بن عبَّاس الفايز</div>
+            </div>
+          </div>
+        </article>
+      </section>
+    </div>
+    <!-- توقيع أو تذييل داخلي ضمن نفس الورقة -->
+    <div class="sheet-footer" id="sheetFooter" aria-label="معلومات إضافية في التذييل">
+      <span class="footer-left" id="footerLeftField" contenteditable="false">MBC: 9-2</span>
+      <span class="footer-right" id="footerRightField" contenteditable="false">BAMZ</span>
+    </div>
+  </main>
+
+  <!-- Hidden PDF Template with Background -->
+  <div class="pdf-template" id="pdfTemplate">
+    <div class="sheet-content">
+      <div class="preview-container" id="pdfContent">
+        <!-- سيتم نسخ المحتوى هنا -->
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script>
+    // State Management
+    const appState = {
+      bank: {
+        name: "البنك الأهلي السعودي",
+        center: "مركز خدمات التجارة",
+        poBox: "3555 جده 21481",
+        email: "tradej-lg@alahli.com"
+      },
+      guarantee: {
+        number: "M113528",
+        contract: "434153",
+        amount: "20,000.00",
+        extensionDate: "30 يوليو 2026"
+      },
+      company: {
+        name: "شركة رؤية القوى للمصاعد"
+      }
+    };
+
+    // DOM Elements
+    const elements = {
+      // Inputs
+      bankName: document.getElementById('bankName'),
+      bankCenter: document.getElementById('bankCenter'),
+      bankPoBox: document.getElementById('bankPoBox'),
+      bankEmail: document.getElementById('bankEmail'),
+      guaranteeNumber: document.getElementById('guaranteeNumber'),
+      contractNumber: document.getElementById('contractNumber'),
+      guaranteeAmount: document.getElementById('guaranteeAmount'),
+      extensionDate: document.getElementById('extensionDate'),
+      companyName: document.getElementById('companyName'),
+      
+      // Preview Elements
+      bankNamePreview: document.getElementById('bank_name'),
+      bankDetails: document.getElementById('bank_details'),
+      subjectText: document.getElementById('subject_text'),
+      contentParagraph1: document.getElementById('content_paragraph1')
+    };
+
+    // Initialize from localStorage or defaults
+    function initializeApp() {
+      const savedState = localStorage.getItem('guaranteeLetterState');
+      if (savedState) {
+        Object.assign(appState, JSON.parse(savedState));
+      }
+      updateInputsFromState();
+      updatePreview();
+      setupEventListeners();
+    }
+
+    // Update inputs from state
+    function updateInputsFromState() {
+      elements.bankName.value = appState.bank.name;
+      elements.bankCenter.value = appState.bank.center;
+      elements.bankPoBox.value = appState.bank.poBox;
+      elements.bankEmail.value = appState.bank.email;
+      elements.guaranteeNumber.value = appState.guarantee.number;
+      elements.contractNumber.value = appState.guarantee.contract;
+      elements.guaranteeAmount.value = appState.guarantee.amount;
+      elements.extensionDate.value = appState.guarantee.extensionDate;
+      elements.companyName.value = appState.company.name;
+    }
+
+    // Update state from inputs
+    function updateStateFromInputs() {
+      appState.bank.name = elements.bankName.value;
+      appState.bank.center = elements.bankCenter.value;
+      appState.bank.poBox = elements.bankPoBox.value;
+      appState.bank.email = elements.bankEmail.value;
+      appState.guarantee.number = elements.guaranteeNumber.value;
+      appState.guarantee.contract = elements.contractNumber.value;
+      appState.guarantee.amount = elements.guaranteeAmount.value;
+      appState.guarantee.extensionDate = elements.extensionDate.value;
+      appState.company.name = elements.companyName.value;
+      
+      localStorage.setItem('guaranteeLetterState', JSON.stringify(appState));
+    }
+
+    // Setup event listeners for real-time updates
+    function setupEventListeners() {
+      const inputs = [
+        'bankName', 'bankCenter', 'bankPoBox', 'bankEmail',
+        'guaranteeNumber', 'contractNumber', 'guaranteeAmount', 'extensionDate',
+        'companyName'
+      ];
+      
+      inputs.forEach(inputId => {
+        document.getElementById(inputId).addEventListener('input', function() {
+          updateStateFromInputs();
+          updatePreview();
+        });
+      });
+    }
+
+    // Update preview
+    function updatePreview() {
+      // Update bank information
+      elements.bankNamePreview.innerHTML = `<div>السـادة / ${appState.bank.name}</div>`;
+      elements.bankDetails.innerHTML = `
+        <div>${appState.bank.center}</div>
+        <div>ص.ب. ${appState.bank.poBox}</div>
+        <div>البريد الإلكتروني: ${appState.bank.email}</div>
+      `;
+
+      // Update subject
+      elements.subjectText.textContent = 
+        `طلب تمديد الضمان البنكي رقم (${appState.guarantee.number}) والعائد للعقد رقم (${appState.guarantee.contract}).`;
+
+      // Update content
+      elements.contentParagraph1.innerHTML = `
+        إشارة إلى الضمان البنكي النهائي الموضح أعلاه، والصادر منكم لصالحنا على حساب ${appState.company.name}
+        بمبلغ قدره (${appState.guarantee.amount}) ريال، نأمل منكم تمديد فترة سريان الضمان حتى تاريخ ${appState.guarantee.extensionDate}م مع بقاء
+        الشروط الأخرى دون تغيير، وإفادتنا بذلك من خلال البريد الإلكتروني المخصص للضمانات البنكية لدى
+        مستشفى الملك فيصل التخصصي ومركز الأبحاث بالرياض (bgfinance@kfshrc.edu.sa)، كما نأمل منكم إرسال أصل
+        تمديد الضمان إلى العنوان التالي:
+      `;
+    }
+
+    // Download PDF
+    async function downloadPDF() {
+      try {
+        if (typeof html2canvas === 'undefined' || typeof window.jspdf === 'undefined') {
+          alert('❌ تعذر تحميل مكتبات PDF');
+          return;
+        }
+
+        const btn = document.getElementById('downloadBtn');
+        btn.textContent = 'جاري التحويل...';
+        btn.disabled = true;
+
+        // Update PDF template content
+        document.getElementById('pdfContent').innerHTML = document.getElementById('primaryLetter').innerHTML;
+
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF({
+          orientation: 'portrait',
+          unit: 'mm',
+          format: 'a4'
+        });
+
+        // Capture the PDF template (with background)
+        const pdfTemplate = document.getElementById('pdfTemplate');
+        const canvas = await html2canvas(pdfTemplate, {
+          scale: 3,
+          useCORS: true,
+          allowTaint: false,
+          backgroundColor: '#ffffff',
+          width: pdfTemplate.offsetWidth,
+          height: pdfTemplate.offsetHeight
+        });
+
+        const imgData = canvas.toDataURL('image/png');
+        const pageWidth = pdf.internal.pageSize.getWidth();
+        const pageHeight = pdf.internal.pageSize.getHeight();
+        
+        pdf.addImage(imgData, 'PNG', 0, 0, pageWidth, pageHeight);
+        
+        const fileName = `طلب_تمديد_الضمان_${appState.guarantee.number}.pdf`;
+        pdf.save(fileName);
+        
+        btn.textContent = 'استخراج PDF';
+        btn.disabled = false;
+        
+        alert('✅ تم إنشاء PDF بنجاح!');
+      } catch (error) {
+        console.error(error);
+        alert('❌ حدث خطأ أثناء إنشاء PDF: ' + error.message);
+        
+        const btn = document.getElementById('downloadBtn');
+        btn.textContent = 'استخراج PDF';
+        btn.disabled = false;
+      }
+    }
+
+    // Initialize the application
+    document.addEventListener('DOMContentLoaded', function() {
+      initializeApp();
+    });
+
+    // Set up download button
+    document.getElementById('downloadBtn').addEventListener('click', downloadPDF);
+  </script>
+</body>
+</html>
