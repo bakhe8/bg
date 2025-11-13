@@ -1,0 +1,10 @@
+pandas
+openpyxl
+rapidfuzz
+python-dateutil
+arabic-reshaper
+python-bidi
+ttkbootstrap
+jinja2>=3.1.0
+weasyprint>=62.0
+pywebview>=4.0.0
